@@ -1,0 +1,35 @@
+{
+  "name": "@tarik02/portal-example-common",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./portal-url": "./src/portal-url.ts",
+    "./server": "./src/server.ts",
+    "./dev-server": "./src/dev-server.ts",
+    "./vite-dev-config": "./src/vite-dev-config.ts",
+    "./vite-dev-proxy-plugin": "./src/vite-dev-proxy-plugin.ts"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "typecheck": "tsc --noEmit",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.14",
+    "@tarik02/portal-server": "workspace:*",
+    "hono": "^4.12.12",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.8",
+    "vite-plus": "^0.1.16"
+  },
+  "peerDependencies": {
+    "@tailwindcss/vite": "*",
+    "tailwindcss": "*",
+    "vite": "^8.0.8"
+  }
+}

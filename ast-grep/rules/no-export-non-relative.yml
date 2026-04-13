@@ -1,0 +1,16 @@
+id: no-export-non-relative
+message: only allow export source paths that are relative or child paths
+language: TSX
+severity: error
+files:
+  - '**/*.ts'
+  - '**/*.tsx'
+rule:
+  kind: export_statement
+  has:
+    field: source
+    regex: '.+'
+  not:
+    has:
+      field: source
+      regex: "^['\"]\\."

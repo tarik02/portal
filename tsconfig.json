@@ -1,0 +1,29 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.root.json"
+    },
+    {
+      "path": "./packages/portal-core/tsconfig.json"
+    },
+    {
+      "path": "./packages/portal-server/tsconfig.json"
+    },
+    {
+      "path": "./packages/portal-playwright-example/tsconfig.json"
+    },
+    {
+      "path": "./packages/portal-puppeteer-example/tsconfig.json"
+    },
+    {
+      "path": "./packages/portal-client/tsconfig.json"
+    },
+    {
+      "path": "./packages/portal-client-example/tsconfig.json"
+    },
+    {
+      "path": "./packages/portal-example-common/tsconfig.json"
+    }
+  ]
+}

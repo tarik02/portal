@@ -1,0 +1,9 @@
+/.vscode/
+/node_modules/
+/.yarn/
+.codex
+.turbo/
+packages/portal-playwright-example/data/
+dist
+*.tsbuildinfo
+**/*.tsbuildinfo
