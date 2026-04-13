@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events';
 import { once } from 'node:events';
 import http from 'node:http';
 
@@ -11,6 +10,57 @@ import { createLengthPrefixedPacketCodec, type PortalPacket } from '@tarik02/por
 import { createPlaywrightExampleServer } from './server';
 
 const codec = createLengthPrefixedPacketCodec();
+
+type EventBus = {
+    emit: (event: string, ...args: unknown[]) => void;
+    on: (event: string, handler: (...args: unknown[]) => void) => void;
+    off: (event: string, handler: (...args: unknown[]) => void) => void;
+};
+
+const createEventBus = (): EventBus => {
+    const target = new EventTarget();
+    const handlers = new Map<string, Map<(...args: unknown[]) => void, EventListener>>();
+
+    const on = (event: string, handler: (...args: unknown[]) => void) => {
+        const listener = ((entry: Event) => {
+            const detail = (entry as CustomEvent<unknown[]>).detail ?? [];
+            handler(...(Array.isArray(detail) ? detail : [detail]));
+        }) as EventListener;
+
+        const eventHandlers = handlers.get(event) ?? new Map();
+        eventHandlers.set(handler, listener);
+        handlers.set(event, eventHandlers);
+        target.addEventListener(event, listener);
+    };
+
+    const off = (event: string, handler: (...args: unknown[]) => void) => {
+        const eventHandlers = handlers.get(event);
+        if (!eventHandlers) {
+            return;
+        }
+
+        const listener = eventHandlers.get(handler);
+        if (!listener) {
+            return;
+        }
+
+        target.removeEventListener(event, listener);
+        eventHandlers.delete(handler);
+        if (eventHandlers.size === 0) {
+            handlers.delete(event);
+        }
+    };
+
+    const emit = (event: string, ...args: unknown[]) => {
+        target.dispatchEvent(new CustomEvent(event, { detail: args }));
+    };
+
+    return {
+        emit,
+        off,
+        on,
+    };
+};
 
 const waitFor = async <T>(read: () => T | undefined, timeoutMs = 2000) => {
     const deadline = Date.now() + timeoutMs;
@@ -67,14 +117,15 @@ const readResponse = async (url: string) =>
     });
 
 const createFakeRuntime = () => {
-    const pageEmitter = new EventEmitter();
-    const cdpEmitter = new EventEmitter();
+    const pageEmitter = createEventBus();
+    const cdpEmitter = createEventBus();
     let currentUrl = 'about:blank';
     let closed = false;
 
     const cdpSession = {
-        detach: vi.fn(async () => {
+        detach: vi.fn(() => {
             cdpEmitter.emit('sessiondetached');
+            return Promise.resolve();
         }),
         off: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
             cdpEmitter.off(event, handler);
@@ -82,9 +133,9 @@ const createFakeRuntime = () => {
         on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
             cdpEmitter.on(event, handler);
         }),
-        send: vi.fn(async (method: string) => {
+        send: vi.fn((method: string) => {
             if (method !== 'Page.startScreencast') {
-                return;
+                return Promise.resolve();
             }
 
             queueMicrotask(() => {
@@ -94,36 +145,40 @@ const createFakeRuntime = () => {
                     sessionId: 1,
                 });
             });
+
+            return Promise.resolve();
         }),
     };
 
     const page = {
-        close: vi.fn(async () => {
+        close: vi.fn(() => {
             closed = true;
             pageEmitter.emit('close');
+            return Promise.resolve();
         }),
         context: vi.fn(() => ({
-            newCDPSession: vi.fn(async () => cdpSession),
+            newCDPSession: vi.fn(() => Promise.resolve(cdpSession)),
         })),
-        goBack: vi.fn(async () => null),
-        goForward: vi.fn(async () => null),
-        goto: vi.fn(async (url: string) => {
+        goBack: vi.fn(() => Promise.resolve(null)),
+        goForward: vi.fn(() => Promise.resolve(null)),
+        goto: vi.fn((url: string) => {
             currentUrl = url;
             pageEmitter.emit('framenavigated');
+            return Promise.resolve();
         }),
         isClosed: vi.fn(() => closed),
         keyboard: {
-            down: vi.fn(async () => {}),
-            press: vi.fn(async () => {}),
-            type: vi.fn(async () => {}),
-            up: vi.fn(async () => {}),
+            down: vi.fn(() => Promise.resolve()),
+            press: vi.fn(() => Promise.resolve()),
+            type: vi.fn(() => Promise.resolve()),
+            up: vi.fn(() => Promise.resolve()),
         },
         mouse: {
-            click: vi.fn(async () => {}),
-            down: vi.fn(async () => {}),
-            move: vi.fn(async () => {}),
-            up: vi.fn(async () => {}),
-            wheel: vi.fn(async () => {}),
+            click: vi.fn(() => Promise.resolve()),
+            down: vi.fn(() => Promise.resolve()),
+            move: vi.fn(() => Promise.resolve()),
+            up: vi.fn(() => Promise.resolve()),
+            wheel: vi.fn(() => Promise.resolve()),
         },
         off: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
             pageEmitter.off(event, handler);
@@ -131,19 +186,20 @@ const createFakeRuntime = () => {
         on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
             pageEmitter.on(event, handler);
         }),
-        reload: vi.fn(async () => {}),
+        reload: vi.fn(() => Promise.resolve()),
         url: vi.fn(() => currentUrl),
     };
     const page$ = new BehaviorSubject<typeof page | null>(page);
 
     const runtime = {
-        close: vi.fn(async () => {
+        close: vi.fn(() => {
             page$.next(null);
-            await page.close();
+            void page.close();
             page$.complete();
+            return Promise.resolve();
         }),
         page$,
-        resolvePage: vi.fn(async () => page),
+        resolvePage: vi.fn(() => Promise.resolve(page)),
     };
 
     return { page, runtime };
@@ -154,7 +210,7 @@ describe('playwright example server', () => {
         const { page, runtime } = createFakeRuntime();
         const server = await createPlaywrightExampleServer({
             port: 0,
-            createBrowserRuntime: async () => runtime as never,
+            createBrowserRuntime: () => Promise.resolve(runtime as never),
         });
 
         const rootResponse = await readResponse(server.url.replace(/^ws/, 'http').replace(/\/portal$/, '/'));

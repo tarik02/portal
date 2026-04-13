@@ -32,7 +32,8 @@ const createSession = (overrides: Partial<UsePortalSessionResult> = {}): UsePort
 
 afterEach(() => {
     cleanup();
-    delete (window as Window & { __PORTAL_CLIENT_EXAMPLE_CONFIG__?: unknown }).__PORTAL_CLIENT_EXAMPLE_CONFIG__;
+    delete (globalThis as typeof globalThis & { __PORTAL_CLIENT_EXAMPLE_CONFIG__?: unknown })
+        .__PORTAL_CLIENT_EXAMPLE_CONFIG__;
     vi.unstubAllGlobals();
 });
 
@@ -95,7 +96,7 @@ describe('App', () => {
                 connect,
             });
 
-        Object.defineProperty(window, '__PORTAL_CLIENT_EXAMPLE_CONFIG__', {
+        Object.defineProperty(globalThis, '__PORTAL_CLIENT_EXAMPLE_CONFIG__', {
             configurable: true,
             value: {
                 hidePortalInput: true,
@@ -426,7 +427,7 @@ describe('App', () => {
         fireEvent.submit(form);
 
         await waitFor(() => {
-            expect(goto).toHaveBeenLastCalledWith(new URL('/p/portal/', window.location.origin).toString());
+            expect(goto).toHaveBeenLastCalledWith(new URL('/p/portal/', globalThis.location.origin).toString());
         });
     });
 

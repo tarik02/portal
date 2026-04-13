@@ -1,7 +1,7 @@
 import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from 'node:http';
 
-import type { PortalBackend } from '@tarik02/portal-server';
 import {
+    type PortalBackend,
     attachPortalConnection,
     createPortalRoomManager,
     createWebSocketServerTransport,
@@ -180,7 +180,8 @@ export const runPortalExampleDev = async <TBrowserRuntime extends { close: () =>
         host,
     });
 
-    let viteServer!: ViteDevServer;
+    const viteServer = await createViteServer(viteOptions);
+
     const httpServer = createHttpServer(async (request, response) => {
         if (!request.url) {
             response.statusCode = 404;
@@ -220,8 +221,6 @@ export const runPortalExampleDev = async <TBrowserRuntime extends { close: () =>
             middlewareMode: true,
         },
     });
-
-    viteServer = await createViteServer(viteOptions);
 
     await new Promise<void>((resolve, reject) => {
         httpServer.once('error', reject);

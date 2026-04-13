@@ -1,7 +1,6 @@
 import { BehaviorSubject, Subject } from 'rxjs';
 
-import type { PortalTransport } from './transport';
-import { clonePortalPacket } from './transport';
+import { clonePortalPacket, type PortalTransport } from './transport';
 
 export const createMemoryPortalTransportPair = (): readonly [PortalTransport, PortalTransport] => {
     const leftMessages = new Subject<ReturnType<typeof clonePortalPacket>>();
@@ -9,9 +8,9 @@ export const createMemoryPortalTransportPair = (): readonly [PortalTransport, Po
     const leftStatus = new BehaviorSubject<'open' | 'closed'>('open');
     const rightStatus = new BehaviorSubject<'open' | 'closed'>('open');
 
-    const closeBoth = async () => {
+    const closeBoth = () => {
         if (leftStatus.value === 'closed' && rightStatus.value === 'closed') {
-            return;
+            return Promise.resolve();
         }
 
         leftStatus.next('closed');
@@ -20,13 +19,15 @@ export const createMemoryPortalTransportPair = (): readonly [PortalTransport, Po
         rightMessages.complete();
         leftStatus.complete();
         rightStatus.complete();
+        return Promise.resolve();
     };
 
     const left: PortalTransport = {
         messages$: leftMessages.asObservable(),
         status$: leftStatus.asObservable(),
-        send: async (packet) => {
+        send: (packet) => {
             rightMessages.next(clonePortalPacket(packet));
+            return Promise.resolve();
         },
         close: closeBoth,
     };
@@ -34,8 +35,9 @@ export const createMemoryPortalTransportPair = (): readonly [PortalTransport, Po
     const right: PortalTransport = {
         messages$: rightMessages.asObservable(),
         status$: rightStatus.asObservable(),
-        send: async (packet) => {
+        send: (packet) => {
             leftMessages.next(clonePortalPacket(packet));
+            return Promise.resolve();
         },
         close: closeBoth,
     };

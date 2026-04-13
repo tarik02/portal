@@ -23,7 +23,7 @@ export const createPuppeteerBrowserRuntime = async (): Promise<PuppeteerBrowserR
 
     return {
         page$,
-        resolvePage: async () => page$.value,
+        resolvePage: () => Promise.resolve(page$.value),
         close: async () => {
             page$.next(null);
             page.off('close', markPageClosed);

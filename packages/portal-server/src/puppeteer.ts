@@ -134,7 +134,7 @@ export const createPuppeteerPortalBackend = ({ page$, resolvePage }: PuppeteerPa
                 }
                 case 'input.keyboard': {
                     await executeKeyboardCommand(page, command);
-                    return;
+                    break;
                 }
             }
         } catch (error) {

@@ -57,7 +57,7 @@ const readConfiguredHidePortalInput = (params: URLSearchParams) => {
 };
 
 export const readPortalConnectionConfig = (): PortalConnectionConfig => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(globalThis.location.search);
 
     return {
         hidePortalInput: readConfiguredHidePortalInput(params),

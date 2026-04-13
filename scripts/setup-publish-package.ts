@@ -38,6 +38,19 @@ function mapLeaf(target: string, kind: 'types' | 'default' | 'import' | 'require
     return `./${stem}.js`;
 }
 
+const resolveExportKind = (key: string): 'types' | 'default' | 'import' | 'require' => {
+    if (key === 'types') {
+        return 'types';
+    }
+    if (key === 'require') {
+        return 'require';
+    }
+    if (key === 'import') {
+        return 'import';
+    }
+    return 'default';
+};
+
 function mapExports(value: unknown): unknown {
     if (typeof value === 'string') {
         return {
@@ -47,7 +60,7 @@ function mapExports(value: unknown): unknown {
     }
 
     if (Array.isArray(value)) {
-        return value.map(mapExports);
+        return value.map((leaf) => mapExports(leaf));
     }
 
     if (!value || typeof value !== 'object') {
@@ -58,8 +71,7 @@ function mapExports(value: unknown): unknown {
 
     for (const [key, child] of Object.entries(value)) {
         if (typeof child === 'string') {
-            const kind =
-                key === 'types' ? 'types' : key === 'require' ? 'require' : key === 'import' ? 'import' : 'default';
+            const kind = resolveExportKind(key);
 
             out[key] = mapLeaf(child, kind);
         } else {
@@ -101,7 +113,7 @@ async function main() {
     delete dist.workspaces;
 
     await mkdir(distDir, { recursive: true });
-    await writeFile(distPath, JSON.stringify(dist, null, 2) + '\n');
+    await writeFile(distPath, `${JSON.stringify(dist, null, 2)}\n`);
 }
 
 await main();

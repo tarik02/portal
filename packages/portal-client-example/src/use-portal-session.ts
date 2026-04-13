@@ -143,7 +143,7 @@ export const usePortalSession: PortalSessionHook = () => {
             const client = createPortalClient({
                 transport: createWebSocketPortalTransport(
                     resolvePortalTransportUrl({
-                        origin: window.location.origin,
+                        origin: globalThis.location.origin,
                         targetUrl: webSocketUrl.trim(),
                         useProxy: import.meta.env.DEV,
                     }),
@@ -310,7 +310,7 @@ export const usePortalSession: PortalSessionHook = () => {
             await connect(
                 createPortalWebSocketUrl({
                     baseUrl: options.baseUrl,
-                    origin: window.location.origin,
+                    origin: globalThis.location.origin,
                     token: options.token,
                 }),
             );

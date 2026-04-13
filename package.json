@@ -20,11 +20,10 @@
     "test": "turbo run test",
     "lint": "vp lint",
     "ast-grep": "ast-grep scan",
-    "format": "vp format --check",
+    "format": "vp fmt --check",
     "typecheck": "tsc -b tsconfig.json",
     "release": "release-it",
     "knip": "knip",
-    "check": "vp check && yarn ast-grep",
     "fix": "vp check --fix"
   },
   "devDependencies": {

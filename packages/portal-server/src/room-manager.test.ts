@@ -17,10 +17,12 @@ describe('portal room manager', () => {
         const [clientTransportA, serverTransportA] = createMemoryPortalTransportPair();
         const [clientTransportB, serverTransportB] = createMemoryPortalTransportPair();
         const frames = new Subject<PortalViewFrame>();
-        const startView = vi.fn(async () => ({
-            frames$: frames.asObservable(),
-            stop: async () => {},
-        }));
+        const startView = vi.fn(() =>
+            Promise.resolve({
+                frames$: frames.asObservable(),
+                stop: () => Promise.resolve(),
+            }),
+        );
 
         const receivedA: string[] = [];
         const receivedB: string[] = [];
@@ -42,9 +44,9 @@ describe('portal room manager', () => {
             transport: serverTransportA,
             createBackend: () => ({
                 location$: EMPTY,
-                execute: async () => {},
+                execute: () => Promise.resolve(),
                 startView,
-                stopView: async () => {},
+                stopView: () => Promise.resolve(),
             }),
         });
         const connectionB = await attachPortalConnection({
@@ -53,9 +55,9 @@ describe('portal room manager', () => {
             transport: serverTransportB,
             createBackend: () => ({
                 location$: EMPTY,
-                execute: async () => {},
+                execute: () => Promise.resolve(),
                 startView,
-                stopView: async () => {},
+                stopView: () => Promise.resolve(),
             }),
         });
 
@@ -81,7 +83,7 @@ describe('portal room manager', () => {
             format: 'jpeg',
             metadata: { width: 1, height: 1 },
             payload: new Uint8Array([7, 8, 9]),
-            ack: async () => {},
+            ack: () => Promise.resolve(),
         });
 
         await tick();

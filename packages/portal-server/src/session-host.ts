@@ -11,8 +11,7 @@ import {
     type PortalExtensionEvent,
     type PortalTransport,
 } from '@tarik02/portal-core';
-import type { PortalViewSource } from './backend';
-import { normalizePortalBackendError, type PortalBackend } from './backend';
+import { normalizePortalBackendError, type PortalBackend, type PortalViewSource } from './backend';
 
 export type PortalExtension = {
     events$?: Observable<PortalExtensionEvent>;
@@ -23,13 +22,7 @@ export type PortalSessionHost = {
     close: () => Promise<void>;
 };
 
-const toErrorEvent = ({
-    requestId,
-    error,
-}: {
-    requestId: string;
-    error: unknown;
-}): PortalCommandErrorEvent => {
+const toErrorEvent = ({ requestId, error }: { requestId: string; error: unknown }): PortalCommandErrorEvent => {
     const normalized = normalizePortalBackendError(error);
     return {
         type: 'command.error',

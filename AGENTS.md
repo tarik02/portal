@@ -4,12 +4,12 @@
 
 - `yarn qg`
   Runs all quality gates defined by `qg` script (slow - prefer individual scripts):
-  - `yarn format`
-  - `yarn lint`
-  - `yarn ast-grep` (without scan!)
-  - `yarn typecheck`
-  - `yarn test`
-  - `yarn build`
+    - `yarn format`
+    - `yarn lint`
+    - `yarn ast-grep` (without scan!)
+    - `yarn typecheck`
+    - `yarn test`
+    - `yarn build`
 
 ## Task runner
 

@@ -129,7 +129,7 @@ export const createPlaywrightPortalBackend = ({ page$, resolvePage }: Playwright
                 }
                 case 'input.keyboard': {
                     await executeKeyboardCommand(page, command);
-                    return;
+                    break;
                 }
             }
         } catch (error) {

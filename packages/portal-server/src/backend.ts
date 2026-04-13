@@ -5,11 +5,7 @@ import type { PortalErrorCode, PortalExecutableCommand } from '@tarik02/portal-c
 export class PortalBackendError extends Error {
     public readonly code: PortalErrorCode;
 
-    public constructor(
-        code: PortalErrorCode,
-        message: string,
-        options?: { cause?: unknown },
-    ) {
+    public constructor(code: PortalErrorCode, message: string, options?: { cause?: unknown }) {
         super(message, options);
         this.name = 'PortalBackendError';
         this.code = code;

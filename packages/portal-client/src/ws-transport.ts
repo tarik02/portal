@@ -65,11 +65,13 @@ export const createWebSocketPortalTransport = (input: string | WebSocket): Porta
     return {
         messages$: messages.asObservable(),
         status$: status.asObservable(),
-        send: async (packet) => {
+        send: (packet) => {
             socket.send(codec.encode(packet) as unknown as BufferSource);
+            return Promise.resolve();
         },
-        close: async () => {
+        close: () => {
             socket.close();
+            return Promise.resolve();
         },
     };
 };

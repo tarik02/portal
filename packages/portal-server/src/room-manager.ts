@@ -40,7 +40,7 @@ const cloneFrame = (frame: PortalViewFrame): PortalViewFrame => ({
     format: frame.format,
     metadata: structuredClone(frame.metadata),
     payload: Uint8Array.from(frame.payload),
-    ack: async () => {},
+    ack: () => Promise.resolve(),
 });
 
 const maybeStopSharedView = async (room: InternalPortalRoom) => {
@@ -96,7 +96,7 @@ export const createPortalRoomManager = (): PortalRoomManager => {
         rooms.delete(room.roomId);
     };
 
-    const attach: PortalRoomManager['attach'] = async ({ roomId, transport, createBackend, createExtensions }) => {
+    const attach: PortalRoomManager['attach'] = ({ roomId, transport, createBackend, createExtensions }) => {
         let room = rooms.get(roomId);
         if (!room) {
             room = {
@@ -159,19 +159,19 @@ export const createPortalRoomManager = (): PortalRoomManager => {
             releaseView,
         });
 
-        return {
-            close: async () => {
-                const state = room.connections.get(connectionId);
-                if (!state) {
-                    return;
-                }
+        const close = async () => {
+            const state = room.connections.get(connectionId);
+            if (!state) {
+                return;
+            }
 
-                room.connections.delete(connectionId);
-                await state.releaseView();
-                await state.host.close();
-                await maybeDeleteRoom(room);
-            },
+            room.connections.delete(connectionId);
+            await state.releaseView();
+            await state.host.close();
+            await maybeDeleteRoom(room);
         };
+
+        return Promise.resolve({ close });
     };
 
     return {

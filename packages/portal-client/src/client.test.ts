@@ -60,7 +60,7 @@ describe('portal client', () => {
             payload: new Uint8Array([1, 2, 3]),
         });
 
-        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        await Promise.resolve();
 
         expect(requestId).not.toBe('');
         expect(frames).toEqual([[1, 2, 3]]);

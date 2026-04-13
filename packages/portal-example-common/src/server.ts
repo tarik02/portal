@@ -280,7 +280,7 @@ export const createPortalExampleServer = async <TBrowserRuntime extends { close:
         configureApp: (app) => {
             app.get('/', (c) => c.html(injectPortalConfig(shellHtml, embeddedConfig)));
             app.get('/index.html', (c) => c.html(injectPortalConfig(shellHtml, embeddedConfig)));
-            app.get('/assets/*', async (c) => readStaticFile(c.req.path, assetsDir));
+            app.get('/assets/*', (c) => readStaticFile(c.req.path, assetsDir));
         },
         createBackend,
         createBrowserRuntime,

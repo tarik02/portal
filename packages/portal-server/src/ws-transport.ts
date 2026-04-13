@@ -97,8 +97,9 @@ export const createWebSocketServerTransport = (socket: WebSocket): PortalTranspo
 
             socket.send(codec.encode(packet));
         },
-        close: async () => {
+        close: () => {
             socket.close();
+            return Promise.resolve();
         },
     };
 };
