@@ -2,6 +2,8 @@
 
 Browser remote-control infrastructure.
 
+![Browser Portal showcase](.github/media/showcase.png)
+
 ## Examples
 
 - [Playwright Server](packages/portal-playwright-example)
