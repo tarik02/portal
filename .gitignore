@@ -3,6 +3,7 @@
 /.yarn/
 .codex
 .turbo/
+**/.tsbuild/
 packages/portal-playwright-example/data/
 dist
 *.tsbuildinfo

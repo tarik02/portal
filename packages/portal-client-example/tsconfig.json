@@ -1,8 +1,20 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": ".tsbuild",
     "ignoreDeprecations": "6.0",
     "types": ["vite/client"]
   },
+  "references": [
+    {
+      "path": "../portal-client/tsconfig.json"
+    },
+    {
+      "path": "../portal-example-common/tsconfig.json"
+    }
+  ],
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"]
 }

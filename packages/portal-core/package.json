@@ -20,7 +20,8 @@
   "scripts": {
     "build": "vp pack",
     "typecheck": "tsc --noEmit",
-    "test": "vp test"
+    "test": "vp test",
+    "clean": "rm -rf dist .tsbuild *.tsbuildinfo"
   },
   "dependencies": {
     "rxjs": "^7.8.2"

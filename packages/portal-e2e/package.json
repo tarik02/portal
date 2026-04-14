@@ -8,10 +8,11 @@
     "e2e:playwright": "playwright test --grep @playwright",
     "e2e:playwright:update": "playwright test --grep @playwright --update-snapshots",
     "e2e:puppeteer": "playwright test --grep @puppeteer",
-    "e2e:puppeteer:update": "playwright test --grep @puppeteer --update-snapshots"
+    "e2e:puppeteer:update": "playwright test --grep @puppeteer --update-snapshots",
+    "clean": "rm -rf .tsbuild *.tsbuildinfo playwright-report test-results"
   },
   "dependencies": {
-    "@tarik02/portal-example-common": "workspace:*"
+    "@tarik02/portal-example-common": "workspace:^"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",

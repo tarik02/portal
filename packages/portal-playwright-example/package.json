@@ -6,12 +6,13 @@
     "dev": "tsx watch --clear-screen=false src/dev.ts",
     "start": "tsx src/main.ts",
     "test": "vp test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .tsbuild *.tsbuildinfo"
   },
   "dependencies": {
-    "@tarik02/portal-core": "workspace:*",
-    "@tarik02/portal-example-common": "workspace:*",
-    "@tarik02/portal-server": "workspace:*",
+    "@tarik02/portal-core": "workspace:^",
+    "@tarik02/portal-example-common": "workspace:^",
+    "@tarik02/portal-server": "workspace:^",
     "rxjs": "^7.8.2",
     "ws": "^8.20.0"
   },

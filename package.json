@@ -15,22 +15,23 @@
     "node": ">=24"
   },
   "scripts": {
-    "qg": "turbo run format lint ast-grep test typecheck build --parallel",
+    "qg": "yarn check && yarn test && yarn build",
     "build": "turbo run build",
-    "build:publishable": "turbo run build --filter=@tarik02/portal-core --filter=@tarik02/portal-client --filter=@tarik02/portal-server",
-    "publish:packages": "yarn workspaces foreach -At --include @tarik02/portal-core --include @tarik02/portal-client --include @tarik02/portal-server npm publish --access public --tolerate-republish",
-    "publish:packages:dry-run": "yarn workspaces foreach -At --include @tarik02/portal-core --include @tarik02/portal-client --include @tarik02/portal-server npm publish --access public --dry-run",
+    "check": "yarn format && yarn lint && yarn ast-grep && yarn typecheck && yarn knip",
+    "clean": "turbo run clean && rm -rf .turbo",
     "test": "turbo run test",
     "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
     "ast-grep": "ast-grep scan",
+    "ast-grep:fix": "node ./scripts/ast-grep-fix.mjs",
     "format": "vp fmt --check",
-    "typecheck": "yarn build:publishable && tsc -b tsconfig.json",
+    "format:fix": "vp fmt --write",
+    "typecheck": "tsc -b",
     "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "yarn build:publishable && yarn publish:packages",
-    "release:dry-run": "yarn build:publishable && yarn publish:packages:dry-run",
+    "release:publish": "yarn workspaces foreach -At --no-private npm publish --access public --tolerate-republish",
+    "release:publish:dry-run": "yarn workspaces foreach -At --no-private npm publish --access public --dry-run",
     "knip": "knip",
-    "fix": "vp check --fix"
+    "fix": "yarn ast-grep:fix && yarn lint:fix && yarn format:fix"
   },
   "devDependencies": {
     "@ast-grep/cli": "^0.42.1",

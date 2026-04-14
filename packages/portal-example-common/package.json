@@ -13,11 +13,12 @@
   "scripts": {
     "build": "vp pack",
     "typecheck": "tsc --noEmit",
-    "test": "vp test"
+    "test": "vp test",
+    "clean": "rm -rf dist .tsbuild *.tsbuildinfo"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.14",
-    "@tarik02/portal-server": "workspace:*",
+    "@tarik02/portal-server": "workspace:^",
     "hono": "^4.12.12",
     "ws": "^8.20.0"
   },

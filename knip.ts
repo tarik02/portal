@@ -1,6 +1,6 @@
-import type { KnipConfig } from 'knip';
+import type { KnipConfig } from 'knip'
 
-const config = {
+const config: KnipConfig = {
     workspaces: {
         '.': {
             entry: ['vite.config.ts'],
@@ -66,6 +66,6 @@ const config = {
             },
         },
     },
-} satisfies KnipConfig;
+};
 
 export default config;

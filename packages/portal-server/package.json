@@ -20,10 +20,11 @@
   "scripts": {
     "build": "vp pack",
     "typecheck": "tsc --noEmit",
-    "test": "vp test"
+    "test": "vp test",
+    "clean": "rm -rf dist .tsbuild *.tsbuildinfo"
   },
   "dependencies": {
-    "@tarik02/portal-core": "workspace:*",
+    "@tarik02/portal-core": "workspace:^",
     "rxjs": "^7.8.2",
     "ws": "^8.20.0"
   },
