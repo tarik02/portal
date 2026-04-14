@@ -1,3 +1,4 @@
+import { access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 import { createPlaywrightPortalBackend } from '@tarik02/portal-server';
@@ -19,16 +20,29 @@ type PlaywrightExampleServerOptions = {
     readonly createBrowserRuntime?: () => Promise<PlaywrightBrowserRuntime>;
 };
 
-const INDEX_HTML_PATH = fileURLToPath(new URL('../../portal-client-example/dist/index.html', import.meta.url));
-const ASSETS_DIR = fileURLToPath(new URL('../../portal-client-example/dist/assets/', import.meta.url));
+const SOURCE_INDEX_HTML_PATH = fileURLToPath(new URL('../../portal-client-example/index.html', import.meta.url));
+const SOURCE_ASSETS_DIR = fileURLToPath(new URL('../../portal-client-example/', import.meta.url));
+const DIST_INDEX_HTML_PATH = fileURLToPath(new URL('../../portal-client-example/dist/index.html', import.meta.url));
+const DIST_ASSETS_DIR = fileURLToPath(new URL('../../portal-client-example/dist/assets/', import.meta.url));
+
+const resolvePortalClientPaths = async () => {
+    try {
+        await access(DIST_INDEX_HTML_PATH);
+        return { indexHtmlPath: DIST_INDEX_HTML_PATH, assetsDir: DIST_ASSETS_DIR };
+    } catch {
+        return { indexHtmlPath: SOURCE_INDEX_HTML_PATH, assetsDir: SOURCE_ASSETS_DIR };
+    }
+};
 
 export const createPlaywrightExampleServer = async ({
     host = '127.0.0.1',
     port = DEFAULT_PORT,
     createBrowserRuntime = createPlaywrightBrowserRuntime,
-}: PlaywrightExampleServerOptions = {}): Promise<PlaywrightExampleServer> =>
-    await createPortalExampleServer({
-        assetsDir: ASSETS_DIR,
+}: PlaywrightExampleServerOptions = {}): Promise<PlaywrightExampleServer> => {
+    const { assetsDir, indexHtmlPath } = await resolvePortalClientPaths();
+
+    return await createPortalExampleServer({
+        assetsDir,
         createBackend: (browserRuntime) => createPlaywrightPortalBackend(browserRuntime),
         createBrowserRuntime,
         embeddedConfig: {
@@ -36,7 +50,8 @@ export const createPlaywrightExampleServer = async ({
             portalUrl: '/portal',
         },
         host,
-        indexHtmlPath: INDEX_HTML_PATH,
+        indexHtmlPath,
         port,
         portalPath: '/portal',
     });
+};

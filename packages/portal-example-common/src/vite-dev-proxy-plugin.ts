@@ -2,7 +2,7 @@ import type { IncomingMessage } from 'node:http';
 import type { Socket } from 'node:net';
 
 import type { Plugin, ViteDevServer } from 'vite';
-import WebSocket, { WebSocketServer, type RawData } from 'ws';
+import { type RawData, WebSocket, WebSocketServer } from 'ws';
 
 import { PORTAL_DEV_PROXY_PATH } from './portal-url.ts';
 
@@ -61,7 +61,7 @@ export const createPortalDevProxyPlugin = (): Plugin => ({
                     }
                 };
 
-                browserSocket.on('message', (data, isBinary) => {
+                browserSocket.on('message', (data: RawData, isBinary) => {
                     if (remoteSocket?.readyState === WebSocket.OPEN) {
                         remoteSocket.send(data, { binary: isBinary });
                         return;
@@ -90,7 +90,7 @@ export const createPortalDevProxyPlugin = (): Plugin => ({
                     queuedMessages.length = 0;
                 });
 
-                remoteSocket.on('message', (data, isBinary) => {
+                remoteSocket.on('message', (data: RawData, isBinary) => {
                     if (browserSocket.readyState === WebSocket.OPEN) {
                         browserSocket.send(data, { binary: isBinary });
                     }

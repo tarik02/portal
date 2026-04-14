@@ -180,8 +180,6 @@ export const runPortalExampleDev = async <TBrowserRuntime extends { close: () =>
         host,
     });
 
-    const viteServer = await createViteServer(viteOptions);
-
     const httpServer = createHttpServer(async (request, response) => {
         if (!request.url) {
             response.statusCode = 404;
@@ -207,8 +205,6 @@ export const runPortalExampleDev = async <TBrowserRuntime extends { close: () =>
         response.end('not found');
     });
 
-    httpServer.on('upgrade', portal.upgradeHandler);
-
     const viteOptions = mergeConfig(portalClientViteBaseConfig, {
         configFile: false,
         appType: 'custom',
@@ -221,6 +217,9 @@ export const runPortalExampleDev = async <TBrowserRuntime extends { close: () =>
             middlewareMode: true,
         },
     });
+    const viteServer = await createViteServer(viteOptions);
+
+    httpServer.on('upgrade', portal.upgradeHandler);
 
     await new Promise<void>((resolve, reject) => {
         httpServer.once('error', reject);

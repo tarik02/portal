@@ -1,5 +1,5 @@
 import { BehaviorSubject, Subject } from 'rxjs';
-import type { WebSocket } from 'ws';
+import { type RawData, WebSocket } from 'ws';
 
 import {
     createLengthPrefixedPacketCodec,
@@ -8,7 +8,7 @@ import {
     type PortalTransportStatus,
 } from '@tarik02/portal-core';
 
-const toUint8Array = (value: WebSocket.RawData): Uint8Array => {
+const toUint8Array = (value: RawData): Uint8Array => {
     if (value instanceof Uint8Array) {
         return Uint8Array.from(value);
     }
@@ -28,10 +28,10 @@ export const createWebSocketServerTransport = (socket: WebSocket): PortalTranspo
     const codec = createLengthPrefixedPacketCodec();
     const messages = new Subject<PortalPacket>();
     const status = new BehaviorSubject<PortalTransportStatus>(
-        socket.readyState === socket.OPEN ? 'open' : 'connecting',
+        socket.readyState === WebSocket.OPEN ? 'open' : 'connecting',
     );
 
-    const onMessage = (value: WebSocket.RawData) => {
+    const onMessage = (value: RawData) => {
         for (const packet of codec.decode(toUint8Array(value))) {
             messages.next(packet);
         }
@@ -55,11 +55,11 @@ export const createWebSocketServerTransport = (socket: WebSocket): PortalTranspo
     socket.on('close', onClose);
 
     const waitForOpen = async () => {
-        if (socket.readyState === socket.OPEN) {
+        if (socket.readyState === WebSocket.OPEN) {
             return true;
         }
 
-        if (socket.readyState === socket.CLOSING || socket.readyState === socket.CLOSED) {
+        if (socket.readyState === WebSocket.CLOSING || socket.readyState === WebSocket.CLOSED) {
             return false;
         }
 
