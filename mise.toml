@@ -1,0 +1,6 @@
+[tools]
+node = "24.14.1"
+yarn = "4.13.0"
+
+[env]
+TURBO_TELEMETRY_DISABLED = "1"

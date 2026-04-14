@@ -1,0 +1,15 @@
+id: no-export-from-non-index
+message: do not use export from statements outside index.ts/index.tsx
+language: TSX
+severity: error
+files:
+  - '**/*.ts'
+  - '**/*.tsx'
+ignores:
+  - '**/index.ts'
+  - '**/index.tsx'
+rule:
+  kind: export_statement
+  has:
+    field: source
+    regex: '.+'

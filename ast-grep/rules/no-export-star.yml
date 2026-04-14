@@ -1,0 +1,10 @@
+id: no-export-star
+message: do not use export * from ...
+language: TSX
+severity: error
+files:
+  - '**/*.ts'
+  - '**/*.tsx'
+rule:
+  kind: export_statement
+  regex: '^export\\s+\\*\\s+from\\b'

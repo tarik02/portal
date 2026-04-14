@@ -1,0 +1,19 @@
+id: no-import-re-export
+message: do not import bindings and then re-export them (no wrappers - import where it is used instead)
+language: TSX
+severity: error
+files:
+  - '**/*.ts'
+  - '**/*.tsx'
+rule:
+  any:
+    - kind: export_statement
+      pattern: export { $$$EXPORTS };
+      follows:
+        pattern: import { $$$IMPORTS } from $SOURCE
+        stopBy: end
+    - kind: export_statement
+      pattern: export const $$$NAME = $NS.$NAME;
+      follows:
+        pattern: import * as $NS from '$SOURCE'
+        stopBy: end

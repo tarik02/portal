@@ -1,0 +1,137 @@
+name: e2e
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CI_YARN_CACHE_DIR: ~/.cache/yarn/berry
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: e2e (${{ matrix.backend }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - backend: playwright
+            port: 41006
+            server_workspace: '@tarik02/portal-playwright-example'
+            test_script: e2e:playwright
+          - backend: puppeteer
+            port: 41007
+            server_workspace: '@tarik02/portal-puppeteer-example'
+            test_script: e2e:puppeteer
+    env:
+      PORT: ${{ matrix.port }}
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+      PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.cache/puppeteer
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+          cache: true
+
+      - name: enable corepack
+        run: corepack enable
+
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CI_YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('yarn.lock', 'packages/portal-e2e/package.json') }}${{ matrix.backend == 'playwright' && format('-{0}', hashFiles('packages/portal-playwright-example/package.json')) || '' }}
+
+      - name: restore puppeteer browsers
+        if: matrix.backend == 'puppeteer'
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUPPETEER_CACHE_DIR }}
+          key: ${{ runner.os }}-puppeteer-browsers-${{ hashFiles('yarn.lock', 'packages/portal-puppeteer-example/package.json') }}
+
+      - name: restore turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo/cache
+          key: ${{ runner.os }}-turbo-e2e-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-e2e-
+
+      - name: install dependencies
+        run: yarn install --immutable
+
+      - name: install playwright runner browser
+        run: yarn workspace @tarik02/portal-e2e exec playwright install --with-deps chromium
+
+      - name: install playwright backend browser
+        if: matrix.backend == 'playwright'
+        run: yarn workspace @tarik02/portal-playwright-example exec playwright install chromium
+
+      - name: install puppeteer backend browser
+        if: matrix.backend == 'puppeteer'
+        run: yarn workspace @tarik02/portal-puppeteer-example exec puppeteer browsers install chrome-headless-shell
+
+      - name: build e2e dependencies
+        run: yarn turbo run build --filter=@tarik02/portal-client-example...
+
+      - name: start example server
+        run: |
+          yarn workspace ${{ matrix.server_workspace }} run start > /tmp/portal-example-server.log 2>&1 &
+
+          for _ in $(seq 1 60); do
+            if curl --fail --silent "http://127.0.0.1:${PORT}/" > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat /tmp/portal-example-server.log
+          exit 1
+
+      - name: run e2e
+        run: yarn workspace @tarik02/portal-e2e run ${{ matrix.test_script }}
+
+      - name: upload playwright html report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.backend }}
+          path: packages/portal-e2e/playwright-report/**
+
+      - name: upload playwright test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results-${{ matrix.backend }}
+          path: packages/portal-e2e/test-results/**
+
+      - name: upload example server log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-example-server-log-${{ matrix.backend }}
+          path: /tmp/portal-example-server.log
