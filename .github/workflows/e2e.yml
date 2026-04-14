@@ -25,10 +25,18 @@ jobs:
             port: 41006
             server_workspace: '@tarik02/portal-playwright-example'
             test_script: e2e:playwright
+            backend_package_manifest: packages/portal-playwright-example/package.json
+            browser_cache_paths: .cache/ms-playwright
+            backend_browser_install: yarn workspace @tarik02/portal-playwright-example exec playwright install chromium
           - backend: puppeteer
             port: 41007
             server_workspace: '@tarik02/portal-puppeteer-example'
             test_script: e2e:puppeteer
+            backend_package_manifest: packages/portal-puppeteer-example/package.json
+            browser_cache_paths: |
+              .cache/ms-playwright
+              .cache/puppeteer
+            backend_browser_install: yarn workspace @tarik02/portal-puppeteer-example exec puppeteer browsers install chrome-headless-shell
     env:
       PORT: ${{ matrix.port }}
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
@@ -60,18 +68,11 @@ jobs:
             .yarn/install-state.gz
           key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
 
-      - name: restore playwright browsers
+      - name: restore browser caches
         uses: actions/cache@v4
         with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('yarn.lock', 'packages/portal-e2e/package.json') }}${{ matrix.backend == 'playwright' && format('-{0}', hashFiles('packages/portal-playwright-example/package.json')) || '' }}
-
-      - name: restore puppeteer browsers
-        if: matrix.backend == 'puppeteer'
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.PUPPETEER_CACHE_DIR }}
-          key: ${{ runner.os }}-puppeteer-browsers-${{ hashFiles('yarn.lock', 'packages/portal-puppeteer-example/package.json') }}
+          path: ${{ matrix.browser_cache_paths }}
+          key: ${{ runner.os }}-browser-cache-${{ matrix.backend }}-${{ hashFiles('yarn.lock', 'packages/portal-e2e/package.json', matrix.backend_package_manifest) }}
 
       - name: restore turbo cache
         uses: actions/cache@v4
@@ -87,13 +88,8 @@ jobs:
       - name: install playwright runner browser
         run: yarn workspace @tarik02/portal-e2e exec playwright install --with-deps chromium
 
-      - name: install playwright backend browser
-        if: matrix.backend == 'playwright'
-        run: yarn workspace @tarik02/portal-playwright-example exec playwright install chromium
-
-      - name: install puppeteer backend browser
-        if: matrix.backend == 'puppeteer'
-        run: yarn workspace @tarik02/portal-puppeteer-example exec puppeteer browsers install chrome-headless-shell
+      - name: install backend browser
+        run: ${{ matrix.backend_browser_install }}
 
       - name: build e2e dependencies
         run: yarn turbo run build --filter=@tarik02/portal-client-example...
