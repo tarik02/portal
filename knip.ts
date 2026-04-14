@@ -3,8 +3,13 @@ import type { KnipConfig } from 'knip';
 const config = {
     workspaces: {
         '.': {
-            entry: ['vite.config.ts', 'scripts/setup-publish-package.ts'],
-            ignoreDependencies: ['jsdom'],
+            entry: ['vite.config.ts', 'scripts/setup-publish-package.ts', 'scripts/publish-workspace.ts'],
+            ignoreDependencies: [
+                'jsdom',
+                'conventional-changelog-conventionalcommits',
+                'conventional-commits-filter',
+                'conventional-commits-parser',
+            ],
             typescript: {
                 config: ['tsconfig.json'],
             },
@@ -52,8 +57,8 @@ const config = {
             },
         },
         'packages/portal-e2e': {
-            entry: ['src/**/*.spec.ts', 'playwright.config.ts', 'scripts/**/*.ts'],
-            project: ['src/**/*.ts', 'scripts/**/*.ts', 'playwright.config.ts'],
+            entry: ['src/**/*.spec.ts'],
+            project: ['src/**/*.ts'],
             typescript: {
                 config: ['tsconfig.json'],
             },
