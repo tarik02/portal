@@ -55,6 +55,28 @@ export const createPortalClient = ({ transport }: { transport: PortalTransport }
         }
     >();
     const subscription = new Subscription();
+    let isClosed = false;
+
+    const rejectAllPending = (error: Error) => {
+        for (const { reject } of pending.values()) {
+            reject(error);
+        }
+        pending.clear();
+    };
+
+    const closeConnection = (error: Error = new Error('portal transport closed')) => {
+        if (isClosed) {
+            return;
+        }
+
+        isClosed = true;
+        rejectAllPending(error);
+        location.complete();
+        frames.complete();
+        errors.complete();
+        events.complete();
+        sentCommands.complete();
+    };
 
     subscription.add(
         transport.messages$.subscribe((packet) => {
@@ -110,8 +132,21 @@ export const createPortalClient = ({ transport }: { transport: PortalTransport }
         }),
     );
 
+    subscription.add(
+        transport.status$.subscribe((status) => {
+            if (status === 'closed') {
+                closeConnection(new Error('portal transport closed'));
+            }
+        }),
+    );
+
     const send = (command: PortalClientCommand) =>
         new Promise<unknown>((resolve, reject) => {
+            if (isClosed) {
+                reject(new Error('portal client is closed'));
+                return;
+            }
+
             pending.set(command.requestId, { resolve, reject });
             sentCommands.next(command);
             void transport
@@ -121,6 +156,9 @@ export const createPortalClient = ({ transport }: { transport: PortalTransport }
                 })
                 .catch((error: unknown) => {
                     pending.delete(command.requestId);
+                    if (isClosed) {
+                        return;
+                    }
                     reject(error instanceof Error ? error : new Error('failed to send portal command'));
                 });
         });
@@ -132,13 +170,9 @@ export const createPortalClient = ({ transport }: { transport: PortalTransport }
         });
 
     const close = async () => {
+        closeConnection(new Error('portal transport closed'));
         subscription.unsubscribe();
         await transport.close();
-        location.complete();
-        frames.complete();
-        errors.complete();
-        events.complete();
-        sentCommands.complete();
     };
 
     return {
