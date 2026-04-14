@@ -36,11 +36,12 @@ jobs:
             browser_cache_paths: |
               .cache/ms-playwright
               .cache/puppeteer
-            backend_browser_install: yarn workspace @tarik02/portal-puppeteer-example exec puppeteer browsers install chrome-headless-shell
+            backend_browser_install: PUPPETEER_SKIP_DOWNLOAD=0 yarn workspace @tarik02/portal-puppeteer-example exec puppeteer browsers install chrome-headless-shell
     env:
       PORT: ${{ matrix.port }}
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
       PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.cache/puppeteer
+      PUPPETEER_SKIP_DOWNLOAD: '1'
     steps:
       - uses: actions/checkout@v6
         with:

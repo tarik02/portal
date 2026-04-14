@@ -68,7 +68,7 @@ export default defineConfig({
                 },
             },
             {
-                files: ['*.json', '*.jsonc', '*.yml', '*.yaml'],
+                files: ['*.json', '*.jsonc', '*.yml', '*.yaml', '*.md'],
                 options: {
                     tabWidth: 2,
                 },

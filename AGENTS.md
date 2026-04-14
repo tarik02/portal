@@ -4,23 +4,23 @@
 
 - `yarn qg`
   Runs the full quality gate:
-    - `yarn check`
-    - `yarn test`
-    - `yarn build`
+  - `yarn check`
+  - `yarn test`
+  - `yarn build`
 
 - `yarn check`
   Runs the non-test quality checks:
-    - `yarn format`
-    - `yarn lint`
-    - `yarn ast-grep`
-    - `yarn typecheck`
-    - `yarn knip`
+  - `yarn format`
+  - `yarn lint`
+  - `yarn ast-grep`
+  - `yarn typecheck`
+  - `yarn knip`
 
 - `yarn fix`
   Runs all available auto-fixes:
-    - `yarn ast-grep:fix`
-    - `yarn lint:fix`
-    - `yarn format:fix`
+  - `yarn ast-grep:fix`
+  - `yarn lint:fix`
+  - `yarn format:fix`
 
 - `yarn clean`
   Runs workspace clean scripts through `turbo` and removes root task state.
