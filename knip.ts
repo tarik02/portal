@@ -15,14 +15,14 @@ const config = {
             },
         },
         'packages/portal-core': {
-            entry: ['src/**/*.test.ts'],
+            entry: ['src/**/*.test.ts', 'package.json'],
             project: ['src/**/*.{ts,tsx}', '!src/index.ts'],
             typescript: {
                 config: ['tsconfig.json'],
             },
         },
         'packages/portal-server': {
-            entry: ['src/**/*.test.ts'],
+            entry: ['src/**/*.test.ts', 'package.json'],
             project: ['src/**/*.{ts,tsx}', '!src/index.ts'],
             typescript: {
                 config: ['tsconfig.json'],
@@ -43,8 +43,8 @@ const config = {
             },
         },
         'packages/portal-client': {
-            entry: ['src/**/*.test.ts'],
-            project: ['src/**/*.{ts,tsx}', '!src/index.ts'],
+            entry: ['src/**/*.test.ts', 'package.json'],
+            project: ['src/**/*.{ts,tsx}'],
             typescript: {
                 config: ['tsconfig.json'],
             },

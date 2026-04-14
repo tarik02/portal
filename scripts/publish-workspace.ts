@@ -39,13 +39,9 @@ async function main() {
     const tag = requireEnv('RELEASE_IT_WORKSPACES_TAG');
     const access = process.env.RELEASE_IT_WORKSPACES_ACCESS || 'public';
     const otp = process.env.RELEASE_IT_WORKSPACES_OTP;
-    const distDir = path.resolve(workspaceRoot, 'dist');
     const workspaceManifest = JSON.parse(await readFile(path.resolve(workspaceRoot, 'package.json'), 'utf8')) as { name: string };
 
-    await run('yarn', ['turbo', 'run', 'build', `--filter=${workspaceManifest.name}`]);
-    await run(process.execPath, ['scripts/setup-publish-package.ts', workspaceRoot]);
-
-    const publishArgs = ['publish', distDir, '--tag', tag, '--access', access];
+    const publishArgs = ['workspace', workspaceManifest.name, 'npm', 'publish', '--tag', tag, '--access', access];
 
     if (isEnabled(process.env.RELEASE_IT_WORKSPACES_DRY_RUN)) {
         publishArgs.push('--dry-run');
@@ -59,7 +55,7 @@ async function main() {
         publishArgs.push('--provenance');
     }
 
-    await run('npm', publishArgs);
+    await run('yarn', publishArgs);
 }
 
 await main();

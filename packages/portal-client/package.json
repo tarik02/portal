@@ -13,6 +13,8 @@
   },
   "scripts": {
     "build": "vp pack",
+    "prepack": "node ../../scripts/setup-publish-package.ts",
+    "postpack": "node ../../scripts/setup-publish-package.ts --restore",
     "typecheck": "tsc --noEmit",
     "test": "vp test"
   },

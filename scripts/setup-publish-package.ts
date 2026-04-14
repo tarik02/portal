@@ -1,5 +1,7 @@
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
 import { z } from 'zod';
 
 const PackageJsonSchema = z.looseObject({
@@ -7,12 +9,15 @@ const PackageJsonSchema = z.looseObject({
     version: z.string().optional(),
     exports: z.unknown().optional(),
     files: z.array(z.string()).optional(),
+    license: z.string().optional(),
+    repository: z.unknown().optional(),
 });
 
 type PackageJson = z.infer<typeof PackageJsonSchema>;
-type DependencyFields = 'dependencies' | 'devDependencies' | 'peerDependencies' | 'optionalDependencies';
 
-const DependencyFields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'] as const;
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(scriptDir, '..');
+const backupFileName = '.package.publish.backup.json';
 
 function toPosix(value: string): string {
     return value.replaceAll(path.sep, '/');
@@ -33,12 +38,12 @@ function mapLeaf(target: string, kind: 'types' | 'default' | 'import' | 'require
     const stem = stripSourceExt(rel);
 
     if (kind === 'types') {
-        return `./${stem}.d.ts`;
+        return `./dist/${stem}.d.ts`;
     }
     if (kind === 'require') {
-        return `./${stem}.cjs`;
+        return `./dist/${stem}.cjs`;
     }
-    return `./${stem}.js`;
+    return `./dist/${stem}.js`;
 }
 
 const resolveExportKind = (key: string): 'types' | 'default' | 'import' | 'require' => {
@@ -75,7 +80,6 @@ function mapExports(value: unknown): unknown {
     for (const [key, child] of Object.entries(value)) {
         if (typeof child === 'string') {
             const kind = resolveExportKind(key);
-
             out[key] = mapLeaf(child, kind);
         } else {
             out[key] = mapExports(child);
@@ -85,87 +89,72 @@ function mapExports(value: unknown): unknown {
     return out;
 }
 
-async function loadWorkspaceVersions() {
-    const versions = new Map<string, string>();
-    const packagesDir = path.resolve(process.cwd(), 'packages');
-    const entries = await readdir(packagesDir, { withFileTypes: true });
+function run(command: string, args: string[], cwd = repoRoot) {
+    return new Promise<void>((resolve, reject) => {
+        const child = spawn(command, args, {
+            cwd,
+            stdio: 'inherit',
+            shell: false,
+        });
 
-    for (const entry of entries) {
-        if (!entry.isDirectory()) {
-            continue;
-        }
-
-        const manifestPath = path.resolve(packagesDir, entry.name, 'package.json');
-
-        try {
-            const manifest = PackageJsonSchema.parse(JSON.parse(await readFile(manifestPath, 'utf8'))) as PackageJson;
-
-            if (manifest.version) {
-                versions.set(manifest.name, manifest.version);
+        child.on('error', reject);
+        child.on('exit', (code) => {
+            if (code === 0) {
+                resolve();
+                return;
             }
-        } catch {
-            // Ignore non-publishable or missing workspace manifests.
-        }
-    }
 
-    return versions;
+            reject(new Error(`${command} exited with code ${code ?? 'null'}`));
+        });
+    });
 }
 
-function replaceWorkspaceRanges(value: unknown, versions: Map<string, string>) {
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
-        return value;
-    }
+async function restoreManifest(workspaceRoot: string) {
+    const packageJsonPath = path.resolve(workspaceRoot, 'package.json');
+    const backupPath = path.resolve(workspaceRoot, backupFileName);
 
-    const updated: Record<string, unknown> = {};
+    await copyFile(backupPath, packageJsonPath);
+    await rm(backupPath, { force: true });
+}
 
-    for (const [name, range] of Object.entries(value)) {
-        if (typeof range === 'string' && range.startsWith('workspace:')) {
-            updated[name] = versions.get(name) ?? range;
-        } else {
-            updated[name] = range;
-        }
-    }
+async function prepareManifest(workspaceRoot: string) {
+    const packageJsonPath = path.resolve(workspaceRoot, 'package.json');
+    const backupPath = path.resolve(workspaceRoot, backupFileName);
+    const distPackageJsonPath = path.resolve(workspaceRoot, 'dist', 'package.json');
+    const source = PackageJsonSchema.parse(JSON.parse(await readFile(packageJsonPath, 'utf8'))) as PackageJson;
+    const rootPackage = JSON.parse(await readFile(path.resolve(repoRoot, 'package.json'), 'utf8')) as {
+        license?: string;
+        repository?: unknown;
+    };
 
-    return updated;
+    await copyFile(packageJsonPath, backupPath);
+    await run('yarn', ['turbo', 'run', 'build', `--filter=${source.name}`]);
+    await mkdir(path.resolve(workspaceRoot, 'dist'), { recursive: true });
+    await rm(distPackageJsonPath, { force: true });
+
+    const publishManifest: PackageJson = {
+        ...source,
+        exports: mapExports(source.exports),
+        license: source.license ?? rootPackage.license,
+        repository: source.repository ?? rootPackage.repository,
+    };
+
+    delete publishManifest.private;
+    delete publishManifest.workspaces;
+
+    await writeFile(packageJsonPath, `${JSON.stringify(publishManifest, null, 2)}\n`);
 }
 
 async function main() {
-    const projectRoot = process.argv[2];
-    if (!projectRoot) {
-        throw new Error('Usage: tsx tools/setup-publish-package.ts <projectRoot>');
+    const workspaceRoot = process.cwd();
+    const shouldRestore = process.argv.includes('--restore');
+
+    if (shouldRestore) {
+        await restoreManifest(workspaceRoot);
+        return;
     }
 
-    const srcPath = path.resolve(projectRoot, 'package.json');
-    const distDir = path.resolve(projectRoot, 'dist');
-    const distPath = path.resolve(distDir, 'package.json');
-
-    const source = PackageJsonSchema.parse(JSON.parse(await readFile(srcPath, 'utf8'))) as PackageJson;
-    const rootPath = path.resolve(process.cwd(), 'package.json');
-    const rootPackage = JSON.parse(await readFile(rootPath, 'utf8')) as { license?: string };
-    const workspaceVersions = await loadWorkspaceVersions();
-
-    const repository = {
-        type: 'git',
-        url: 'git+https://github.com/tarik02/portal.git',
-    };
-
-    const dist: PackageJson = {
-        ...source,
-        license: rootPackage.license,
-        repository,
-        files: ['*'],
-        exports: mapExports(source.exports),
-    };
-
-    for (const field of DependencyFields) {
-        dist[field as DependencyFields] = replaceWorkspaceRanges(dist[field as DependencyFields], workspaceVersions);
-    }
-
-    delete dist.private;
-    delete dist.workspaces;
-
-    await mkdir(distDir, { recursive: true });
-    await writeFile(distPath, `${JSON.stringify(dist, null, 2)}\n`);
+    await prepareManifest(workspaceRoot);
 }
 
 await main();
