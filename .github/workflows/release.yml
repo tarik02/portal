@@ -57,7 +57,7 @@ jobs:
       - name: setup npm auth
         if: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
         run: |
-          yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
+          yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" --home
           npm config set //registry.npmjs.org/:_authToken "${NODE_AUTH_TOKEN}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
