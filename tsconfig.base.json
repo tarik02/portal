@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@tarik02/portal-core": ["./packages/portal-core/src/index.ts"],
+      "@tarik02/portal-client": ["./packages/portal-client/src/index.ts"],
+      "@tarik02/portal-server": ["./packages/portal-server/src/index.ts"],
+      "@tarik02/portal-example-common": ["./packages/portal-example-common/src/index.ts"],
+      "@tarik02/portal-example-common/*": ["./packages/portal-example-common/src/*.ts"]
+    },
     "skipLibCheck": true,
     "target": "ESNext",
     "moduleDetection": "force",
@@ -17,7 +24,6 @@
     "noUnusedParameters": true,
 
     "module": "ESNext",
-    "noEmit": true,
 
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM"]

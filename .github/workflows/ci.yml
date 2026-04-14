@@ -4,14 +4,33 @@ on:
   pull_request:
 
 env:
-  CI_YARN_CACHE_DIR: ~/.cache/yarn/berry
+  CI_YARN_CACHE_DIR: ~/.yarn/berry/cache
 
 jobs:
-  build:
-    name: build
+  ci:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: build
+            command: yarn build
+          - name: lint
+            command: yarn lint -- --format github
+          - name: ast-grep
+            command: yarn ast-grep -- --format github
+          - name: format
+            command: yarn format
+          - name: typecheck
+            command: yarn typecheck
+          - name: test
+            build: true
+            command: yarn turbo run test -- --reporter=github-actions
+          - name: knip
+            command: yarn knip --reporter github-actions
     steps:
       - uses: actions/checkout@v6
         with:
@@ -24,6 +43,9 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: ensure yarn cache directory exists
+        run: mkdir -p "${CI_YARN_CACHE_DIR}"
 
       - name: restore yarn package store
         uses: actions/cache@v4
@@ -43,197 +65,8 @@ jobs:
         run: yarn install --immutable
 
       - name: build
-        run: yarn turbo run build
+        if: matrix.build
+        run: yarn build
 
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-          cache: true
-
-      - name: enable corepack
-        run: corepack enable
-
-      - name: restore yarn package store
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CI_YARN_CACHE_DIR }}
-          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/install-state.gz
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: install dependencies
-        run: yarn install --immutable
-
-      - name: lint (oxlint)
-        run: yarn vp lint --format github
-
-      - name: lint (ast-grep)
-        run: yarn ast-grep -- --format github
-
-  format:
-    name: format
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-          cache: true
-
-      - name: enable corepack
-        run: corepack enable
-
-      - name: restore yarn package store
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CI_YARN_CACHE_DIR }}
-          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/install-state.gz
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: install dependencies
-        run: yarn install --immutable
-
-      - name: format
-        run: yarn vp fmt --check
-
-  typecheck:
-    name: typecheck
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-          cache: true
-
-      - name: enable corepack
-        run: corepack enable
-
-      - name: restore yarn package store
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CI_YARN_CACHE_DIR }}
-          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/install-state.gz
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: install dependencies
-        run: yarn install --immutable
-
-      - name: typecheck
-        run: yarn typecheck
-
-  test:
-    name: test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-          cache: true
-
-      - name: enable corepack
-        run: corepack enable
-
-      - name: restore yarn package store
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CI_YARN_CACHE_DIR }}
-          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/install-state.gz
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: install dependencies
-        run: yarn install --immutable
-
-      - name: test
-        run: yarn turbo run test -- --reporter=github-actions
-
-  knip:
-    name: knip
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-          cache: true
-
-      - name: enable corepack
-        run: corepack enable
-
-      - name: restore yarn package store
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CI_YARN_CACHE_DIR }}
-          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/install-state.gz
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
-
-      - name: install dependencies
-        run: yarn install --immutable
-
-      - name: knip
-        run: yarn knip --reporter github-actions
+      - name: run ${{ matrix.name }}
+        run: ${{ matrix.command }}

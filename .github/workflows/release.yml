@@ -1,6 +1,9 @@
 name: release
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
     inputs:
       dry_run:
@@ -13,14 +16,16 @@ on:
       - master
 
 env:
-  CI_YARN_CACHE_DIR: ~/.cache/yarn/berry
+  CI_YARN_CACHE_DIR: ~/.yarn/berry/cache
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  dry-run:
     permissions:
-      contents: write
-      id-token: write
+      contents: read
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
@@ -36,6 +41,9 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: ensure yarn cache directory exists
+        run: mkdir -p "${CI_YARN_CACHE_DIR}"
 
       - name: restore yarn package store
         uses: actions/cache@v4
@@ -54,26 +62,72 @@ jobs:
       - name: install dependencies
         run: yarn install --immutable
 
+      - name: build
+        run: yarn build
+
+      - name: dry-run release publish
+        run: yarn release:publish:dry-run
+
+  release:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+          cache: true
+
+      - name: enable corepack
+        run: corepack enable
+
+      - name: ensure yarn cache directory exists
+        run: mkdir -p "${CI_YARN_CACHE_DIR}"
+
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CI_YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: install dependencies
+        run: yarn install --immutable
+
+      - name: build
+        run: yarn build
+
       - name: setup npm auth
-        if: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
-        run: |
-          yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" --home
-          npm config set //registry.npmjs.org/:_authToken "${NODE_AUTH_TOKEN}"
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" --home
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: setup git author
-        if: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: release
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ inputs.dry_run }}" = "true" ]; then
-            yarn release --dry-run
-          else
-            PUBLISH_PROVENANCE=true yarn release
-          fi
+      - name: create release pr or publish packages
+        uses: changesets/action@v1
+        with:
+          version: yarn changeset version
+          publish: yarn release:publish
+          commit: release packages
+          title: release packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

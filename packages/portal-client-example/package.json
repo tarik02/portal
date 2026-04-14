@@ -5,14 +5,15 @@
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
-    "test": "vp test"
+    "test": "vp test",
+    "clean": "rm -rf dist .tsbuild *.tsbuildinfo"
   },
   "dependencies": {
     "@floating-ui/react": "^0.27.19",
     "@tanstack/react-hotkeys": "^0.9.1",
     "@tanstack/react-virtual": "^3.13.23",
-    "@tarik02/portal-client": "workspace:*",
-    "@tarik02/portal-example-common": "workspace:*",
+    "@tarik02/portal-client": "workspace:^",
+    "@tarik02/portal-example-common": "workspace:^",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.8.0",

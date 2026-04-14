@@ -1,28 +1,23 @@
 import type { KnipConfig } from 'knip';
 
-const config = {
+const config: KnipConfig = {
     workspaces: {
         '.': {
-            entry: ['vite.config.ts', 'scripts/setup-publish-package.ts', 'scripts/publish-workspace.ts'],
-            ignoreDependencies: [
-                'jsdom',
-                'conventional-changelog-conventionalcommits',
-                'conventional-commits-filter',
-                'conventional-commits-parser',
-            ],
+            entry: ['vite.config.ts'],
+            ignoreDependencies: ['jsdom'],
             typescript: {
                 config: ['tsconfig.json'],
             },
         },
         'packages/portal-core': {
-            entry: ['src/**/*.test.ts'],
+            entry: ['src/**/*.test.ts', 'src/index.ts', 'package.json'],
             project: ['src/**/*.{ts,tsx}', '!src/index.ts'],
             typescript: {
                 config: ['tsconfig.json'],
             },
         },
         'packages/portal-server': {
-            entry: ['src/**/*.test.ts'],
+            entry: ['src/**/*.test.ts', 'src/index.ts', 'package.json'],
             project: ['src/**/*.{ts,tsx}', '!src/index.ts'],
             typescript: {
                 config: ['tsconfig.json'],
@@ -43,8 +38,8 @@ const config = {
             },
         },
         'packages/portal-client': {
-            entry: ['src/**/*.test.ts'],
-            project: ['src/**/*.{ts,tsx}', '!src/index.ts'],
+            entry: ['src/**/*.test.ts', 'src/index.ts', 'package.json'],
+            project: ['src/**/*.{ts,tsx}'],
             typescript: {
                 config: ['tsconfig.json'],
             },
@@ -71,6 +66,6 @@ const config = {
             },
         },
     },
-} satisfies KnipConfig;
+};
 
 export default config;

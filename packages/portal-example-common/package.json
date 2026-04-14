@@ -1,5 +1,6 @@
 {
   "name": "@tarik02/portal-example-common",
+  "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -12,17 +13,18 @@
   "scripts": {
     "build": "vp pack",
     "typecheck": "tsc --noEmit",
-    "test": "vp test"
+    "test": "vp test",
+    "clean": "rm -rf dist .tsbuild *.tsbuildinfo"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.14",
-    "@tarik02/portal-server": "workspace:*",
+    "@tarik02/portal-server": "workspace:^",
     "hono": "^4.12.12",
     "ws": "^8.20.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",
-    "@types/ws": "^8.18.0",
+    "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^6.0.1",
     "typescript": "^6.0.2",
     "vite": "^8.0.8",

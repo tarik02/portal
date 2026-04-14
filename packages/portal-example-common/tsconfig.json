@@ -1,7 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": ".tsbuild",
     "types": ["node"]
   },
+  "references": [
+    {
+      "path": "../portal-server/tsconfig.json"
+    }
+  ],
   "include": ["src/**/*"]
 }
