@@ -2,8 +2,14 @@
   "name": "@tarik02/portal-core",
   "version": "0.1.1",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": [
     "dist"
@@ -13,8 +19,6 @@
   },
   "scripts": {
     "build": "vp pack",
-    "prepack": "node ../../scripts/setup-publish-package.ts",
-    "postpack": "node ../../scripts/setup-publish-package.ts --restore",
     "typecheck": "tsc --noEmit",
     "test": "vp test"
   },

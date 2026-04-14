@@ -1,5 +1,6 @@
 {
   "name": "@tarik02/portal-example-common",
+  "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
