@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 function requireEnv(name: string): string {
@@ -39,7 +40,9 @@ async function main() {
     const access = process.env.RELEASE_IT_WORKSPACES_ACCESS || 'public';
     const otp = process.env.RELEASE_IT_WORKSPACES_OTP;
     const distDir = path.resolve(workspaceRoot, 'dist');
+    const workspaceManifest = JSON.parse(await readFile(path.resolve(workspaceRoot, 'package.json'), 'utf8')) as { name: string };
 
+    await run('yarn', ['turbo', 'run', 'build', `--filter=${workspaceManifest.name}`]);
     await run(process.execPath, ['scripts/setup-publish-package.ts', workspaceRoot]);
 
     const publishArgs = ['publish', distDir, '--tag', tag, '--access', access];
