@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  CI_YARN_CACHE_DIR: ~/.cache/yarn/berry
+  CI_YARN_CACHE_DIR: ~/.yarn/berry/cache
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -53,6 +53,9 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: ensure yarn cache directory exists
+        run: mkdir -p "${CI_YARN_CACHE_DIR}"
 
       - name: restore yarn package store
         uses: actions/cache@v4

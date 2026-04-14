@@ -4,7 +4,7 @@ on:
   pull_request:
 
 env:
-  CI_YARN_CACHE_DIR: ~/.cache/yarn/berry
+  CI_YARN_CACHE_DIR: ~/.yarn/berry/cache
 
 jobs:
   ci:
@@ -43,6 +43,9 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: ensure yarn cache directory exists
+        run: mkdir -p "${CI_YARN_CACHE_DIR}"
 
       - name: restore yarn package store
         uses: actions/cache@v4
