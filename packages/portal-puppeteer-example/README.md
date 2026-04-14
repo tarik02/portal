@@ -3,7 +3,7 @@
 ## run
 
 ```bash
-yarn exec puppeteer browsers install chrome
+yarn puppeteer browsers install chrome-headless-shell
 yarn workspace @tarik02/portal-client-example build
 yarn workspace @tarik02/portal-puppeteer-example start
 ```
