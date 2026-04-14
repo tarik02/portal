@@ -18,7 +18,7 @@ import { PORTAL_EXAMPLE_VISUAL_FIXTURE_HTML } from './visual-fixture';
 export const PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_PATH = '/__e2e/interactive';
 export const PORTAL_EXAMPLE_VISUAL_FIXTURE_PATH = '/__e2e/visual';
 
-const PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_HTML_PATH = new URL('./interactive-fixture.html', import.meta.url);
+const PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_HTML_PATH = new URL('interactive-fixture.html', import.meta.url);
 
 export type PortalExampleEmbeddedConfig = {
     portalUrl: string;

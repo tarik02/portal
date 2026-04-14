@@ -35,7 +35,7 @@ const countMatches = () => {
     const matches = JSON.parse(output);
 
     if (!Array.isArray(matches)) {
-        throw new Error('unexpected ast-grep json output');
+        throw new TypeError('unexpected ast-grep json output');
     }
 
     return matches.length;
