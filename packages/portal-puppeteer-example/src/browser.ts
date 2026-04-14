@@ -9,6 +9,7 @@ export type PuppeteerBrowserRuntime = {
 
 export const createPuppeteerBrowserRuntime = async (): Promise<PuppeteerBrowserRuntime> => {
     const browser = await launch({
+        args: process.env.CI ? ['--no-sandbox'] : [],
         defaultViewport: {
             deviceScaleFactor: 1,
             height: 800,

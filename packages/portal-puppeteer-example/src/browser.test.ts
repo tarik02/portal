@@ -91,6 +91,7 @@ describe('puppeteer browser runtime', () => {
         const runtime = await createPuppeteerBrowserRuntime();
 
         expect(launch).toHaveBeenCalledWith({
+            args: process.env.CI ? ['--no-sandbox'] : [],
             defaultViewport: {
                 deviceScaleFactor: 1,
                 height: 800,

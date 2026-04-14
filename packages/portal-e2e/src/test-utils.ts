@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { expect, type Locator, type Page } from '@playwright/test';
 
 const REMOTE_BROWSER_VIEW_SIZE = {
@@ -42,13 +43,23 @@ const getBrowserViewPosition = async (page: Page, point: { x: number; y: number 
 
 export const waitForBrowserViewFrameChange = async (page: Page, action: () => Promise<void> | void) => {
     const browserViewImage = page.getByTestId('browser-view-image');
-    const previousSrc = await browserViewImage.getAttribute('src');
+    const previousSrcHash = createHash('sha256')
+        .update((await browserViewImage.getAttribute('src')) ?? '')
+        .digest('hex');
 
     await action();
 
     await expect
-        .poll(async () => await browserViewImage.getAttribute('src'))
-        .not.toBe(previousSrc);
+        .poll(
+            async () =>
+                createHash('sha256')
+                    .update((await browserViewImage.getAttribute('src')) ?? '')
+                    .digest('hex'),
+            {
+                message: 'expected the browser view frame image to change',
+            },
+        )
+        .not.toBe(previousSrcHash);
 };
 
 export const clickBrowserViewAt = async (page: Page, point: { x: number; y: number }) => {

@@ -1,436 +1,438 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Portal Interactive Fixture</title>
-    <style>
-      :root {
-        color-scheme: light;
-        font-family: "Helvetica Neue", Arial, sans-serif;
-        --bg: #f3ede3;
-        --ink: #1a2430;
-        --muted: #566473;
-        --panel: rgba(255, 255, 255, 0.82);
-        --line: rgba(26, 36, 48, 0.12);
-        --accent: #1f7a6a;
-        --accent-soft: rgba(31, 122, 106, 0.14);
-        --signal: #d36f3f;
-        --signal-soft: rgba(211, 111, 63, 0.18);
-        --focus: #224f9c;
-      }
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Portal Interactive Fixture</title>
+        <style>
+            :root {
+                color-scheme: light;
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+                --bg: #f3ede3;
+                --ink: #1a2430;
+                --muted: #566473;
+                --panel: rgba(255, 255, 255, 0.82);
+                --line: rgba(26, 36, 48, 0.12);
+                --accent: #1f7a6a;
+                --accent-soft: rgba(31, 122, 106, 0.14);
+                --signal: #d36f3f;
+                --signal-soft: rgba(211, 111, 63, 0.18);
+                --focus: #224f9c;
+            }
 
-      * {
-        box-sizing: border-box;
-      }
+            * {
+                box-sizing: border-box;
+            }
 
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background:
-          radial-gradient(circle at top right, rgba(31, 122, 106, 0.16), transparent 24%),
-          radial-gradient(circle at bottom left, rgba(211, 111, 63, 0.18), transparent 26%),
-          linear-gradient(180deg, #f8f2e8 0%, var(--bg) 100%);
-        color: var(--ink);
-      }
+            body {
+                margin: 0;
+                min-height: 100vh;
+                background:
+                    radial-gradient(circle at top right, rgba(31, 122, 106, 0.16), transparent 24%),
+                    radial-gradient(circle at bottom left, rgba(211, 111, 63, 0.18), transparent 26%),
+                    linear-gradient(180deg, #f8f2e8 0%, var(--bg) 100%);
+                color: var(--ink);
+            }
 
-      main {
-        position: relative;
-        width: 1280px;
-        min-height: 800px;
-        overflow: hidden;
-      }
+            main {
+                position: relative;
+                width: 1280px;
+                min-height: 800px;
+                overflow: hidden;
+            }
 
-      .intro {
-        position: absolute;
-        left: 64px;
-        top: 64px;
-        width: 428px;
-        padding: 32px;
-        border: 1px solid var(--line);
-        border-radius: 30px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.7));
-        box-shadow: 0 24px 80px rgba(26, 36, 48, 0.1);
-      }
+            .intro {
+                position: absolute;
+                left: 64px;
+                top: 64px;
+                width: 428px;
+                padding: 32px;
+                border: 1px solid var(--line);
+                border-radius: 30px;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.7));
+                box-shadow: 0 24px 80px rgba(26, 36, 48, 0.1);
+            }
 
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 14px;
-        border-radius: 999px;
-        background: var(--accent-soft);
-        color: var(--accent);
-        font-size: 13px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
+            .eyebrow {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 14px;
+                border-radius: 999px;
+                background: var(--accent-soft);
+                color: var(--accent);
+                font-size: 13px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
 
-      h1 {
-        margin: 24px 0 12px;
-        max-width: 10ch;
-        font-size: 58px;
-        line-height: 0.95;
-        letter-spacing: -0.05em;
-      }
+            h1 {
+                margin: 24px 0 12px;
+                max-width: 10ch;
+                font-size: 58px;
+                line-height: 0.95;
+                letter-spacing: -0.05em;
+            }
 
-      .lede {
-        margin: 0;
-        color: var(--muted);
-        font-size: 19px;
-        line-height: 1.55;
-      }
+            .lede {
+                margin: 0;
+                color: var(--muted);
+                font-size: 19px;
+                line-height: 1.55;
+            }
 
-      .state-grid {
-        display: grid;
-        gap: 14px;
-        margin-top: 28px;
-      }
+            .state-grid {
+                display: grid;
+                gap: 14px;
+                margin-top: 28px;
+            }
 
-      .state-card {
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        padding: 18px 20px;
-        background: rgba(255, 255, 255, 0.72);
-      }
+            .state-card {
+                border: 1px solid var(--line);
+                border-radius: 20px;
+                padding: 18px 20px;
+                background: rgba(255, 255, 255, 0.72);
+            }
 
-      .state-label {
-        display: block;
-        color: var(--muted);
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
+            .state-label {
+                display: block;
+                color: var(--muted);
+                font-size: 12px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
 
-      .state-value {
-        display: block;
-        margin-top: 10px;
-        font-size: 28px;
-        font-weight: 700;
-        letter-spacing: -0.04em;
-      }
+            .state-value {
+                display: block;
+                margin-top: 10px;
+                font-size: 28px;
+                font-weight: 700;
+                letter-spacing: -0.04em;
+            }
 
-      .state-meta {
-        display: block;
-        margin-top: 8px;
-        color: var(--muted);
-        font-size: 14px;
-        line-height: 1.45;
-      }
+            .state-meta {
+                display: block;
+                margin-top: 8px;
+                color: var(--muted);
+                font-size: 14px;
+                line-height: 1.45;
+            }
 
-      .stage {
-        position: absolute;
-        inset: 48px 48px 48px 560px;
-        border: 1px solid rgba(26, 36, 48, 0.1);
-        border-radius: 36px;
-        background:
-          linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.5)),
-          linear-gradient(180deg, rgba(31, 122, 106, 0.06), rgba(211, 111, 63, 0.08));
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
-      }
+            .stage {
+                position: absolute;
+                inset: 48px 48px 48px 560px;
+                border: 1px solid rgba(26, 36, 48, 0.1);
+                border-radius: 36px;
+                background:
+                    linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.5)),
+                    linear-gradient(180deg, rgba(31, 122, 106, 0.06), rgba(211, 111, 63, 0.08));
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+            }
 
-      .stage-header {
-        position: absolute;
-        left: 48px;
-        top: 40px;
-      }
+            .stage-header {
+                position: absolute;
+                left: 48px;
+                top: 40px;
+            }
 
-      .stage-header strong {
-        display: block;
-        font-size: 24px;
-        letter-spacing: -0.03em;
-      }
+            .stage-header strong {
+                display: block;
+                font-size: 24px;
+                letter-spacing: -0.03em;
+            }
 
-      .stage-header span {
-        display: block;
-        margin-top: 10px;
-        color: var(--muted);
-        font-size: 15px;
-      }
+            .stage-header span {
+                display: block;
+                margin-top: 10px;
+                color: var(--muted);
+                font-size: 15px;
+            }
 
-      .mouse-target {
-        position: absolute;
-        left: 176px;
-        top: 136px;
-        width: 420px;
-        height: 220px;
-        border: 1px solid rgba(31, 122, 106, 0.18);
-        border-radius: 30px;
-        background:
-          linear-gradient(180deg, rgba(31, 122, 106, 0.16), rgba(31, 122, 106, 0.04)),
-          rgba(255, 255, 255, 0.82);
-        box-shadow: 0 18px 44px rgba(31, 122, 106, 0.12);
-        color: inherit;
-        cursor: pointer;
-        transition:
-          transform 120ms ease,
-          box-shadow 120ms ease,
-          border-color 120ms ease,
-          background 120ms ease;
-      }
+            .mouse-target {
+                position: absolute;
+                left: 176px;
+                top: 136px;
+                width: 420px;
+                height: 220px;
+                border: 1px solid rgba(31, 122, 106, 0.18);
+                border-radius: 30px;
+                background:
+                    linear-gradient(180deg, rgba(31, 122, 106, 0.16), rgba(31, 122, 106, 0.04)),
+                    rgba(255, 255, 255, 0.82);
+                box-shadow: 0 18px 44px rgba(31, 122, 106, 0.12);
+                color: inherit;
+                cursor: pointer;
+                transition:
+                    transform 120ms ease,
+                    box-shadow 120ms ease,
+                    border-color 120ms ease,
+                    background 120ms ease;
+            }
 
-      .mouse-target-copy {
-        display: grid;
-        gap: 14px;
-        place-items: center;
-        width: 100%;
-        height: 100%;
-        text-align: center;
-      }
+            .mouse-target-copy {
+                display: grid;
+                gap: 14px;
+                place-items: center;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+            }
 
-      .mouse-target-label {
-        font-size: 14px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--accent);
-      }
+            .mouse-target-label {
+                font-size: 14px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: var(--accent);
+            }
 
-      .mouse-target strong {
-        font-size: 34px;
-        line-height: 1;
-        letter-spacing: -0.04em;
-      }
+            .mouse-target strong {
+                font-size: 34px;
+                line-height: 1;
+                letter-spacing: -0.04em;
+            }
 
-      .mouse-target span {
-        max-width: 24ch;
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.45;
-      }
+            .mouse-target span {
+                max-width: 24ch;
+                color: var(--muted);
+                font-size: 15px;
+                line-height: 1.45;
+            }
 
-      .mouse-target.is-hovered {
-        border-color: rgba(31, 122, 106, 0.35);
-        box-shadow: 0 26px 58px rgba(31, 122, 106, 0.16);
-      }
+            .mouse-target.is-hovered {
+                border-color: rgba(31, 122, 106, 0.35);
+                box-shadow: 0 26px 58px rgba(31, 122, 106, 0.16);
+            }
 
-      .mouse-target.is-pressed {
-        transform: translateY(4px) scale(0.99);
-      }
+            .mouse-target.is-pressed {
+                transform: translateY(4px) scale(0.99);
+            }
 
-      .mouse-target.is-active {
-        border-color: rgba(211, 111, 63, 0.4);
-        background:
-          linear-gradient(180deg, rgba(211, 111, 63, 0.22), rgba(211, 111, 63, 0.08)),
-          rgba(255, 255, 255, 0.9);
-        box-shadow: 0 30px 72px rgba(211, 111, 63, 0.2);
-      }
+            .mouse-target.is-active {
+                border-color: rgba(211, 111, 63, 0.4);
+                background:
+                    linear-gradient(180deg, rgba(211, 111, 63, 0.22), rgba(211, 111, 63, 0.08)),
+                    rgba(255, 255, 255, 0.9);
+                box-shadow: 0 30px 72px rgba(211, 111, 63, 0.2);
+            }
 
-      .keyboard-panel {
-        position: absolute;
-        left: 176px;
-        top: 428px;
-        width: 420px;
-        padding: 24px;
-        border: 1px solid var(--line);
-        border-radius: 28px;
-        background: rgba(255, 255, 255, 0.84);
-        box-shadow: 0 18px 54px rgba(26, 36, 48, 0.1);
-      }
+            .keyboard-panel {
+                position: absolute;
+                left: 176px;
+                top: 428px;
+                width: 420px;
+                padding: 24px;
+                border: 1px solid var(--line);
+                border-radius: 28px;
+                background: rgba(255, 255, 255, 0.84);
+                box-shadow: 0 18px 54px rgba(26, 36, 48, 0.1);
+            }
 
-      .keyboard-panel label {
-        display: block;
-        color: var(--muted);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
+            .keyboard-panel label {
+                display: block;
+                color: var(--muted);
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
 
-      .keyboard-panel input {
-        width: 100%;
-        margin-top: 14px;
-        padding: 18px 20px;
-        border: 1px solid rgba(34, 79, 156, 0.16);
-        border-radius: 18px;
-        background: rgba(248, 250, 255, 0.94);
-        color: var(--ink);
-        font: inherit;
-        font-size: 28px;
-        letter-spacing: -0.03em;
-        outline: none;
-        transition:
-          border-color 120ms ease,
-          box-shadow 120ms ease,
-          background 120ms ease;
-      }
+            .keyboard-panel input {
+                width: 100%;
+                margin-top: 14px;
+                padding: 18px 20px;
+                border: 1px solid rgba(34, 79, 156, 0.16);
+                border-radius: 18px;
+                background: rgba(248, 250, 255, 0.94);
+                color: var(--ink);
+                font: inherit;
+                font-size: 28px;
+                letter-spacing: -0.03em;
+                outline: none;
+                transition:
+                    border-color 120ms ease,
+                    box-shadow 120ms ease,
+                    background 120ms ease;
+            }
 
-      .keyboard-panel input:focus {
-        border-color: rgba(34, 79, 156, 0.45);
-        background: rgba(255, 255, 255, 0.98);
-        box-shadow: 0 0 0 6px rgba(34, 79, 156, 0.14);
-      }
+            .keyboard-panel input:focus {
+                border-color: rgba(34, 79, 156, 0.45);
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: 0 0 0 6px rgba(34, 79, 156, 0.14);
+            }
 
-      .typed-value {
-        margin-top: 16px;
-        padding: 14px 16px;
-        border-radius: 18px;
-        background: rgba(34, 79, 156, 0.06);
-        color: var(--muted);
-        font-size: 15px;
-      }
+            .typed-value {
+                margin-top: 16px;
+                padding: 14px 16px;
+                border-radius: 18px;
+                background: rgba(34, 79, 156, 0.06);
+                color: var(--muted);
+                font-size: 15px;
+            }
 
-      .typed-value strong {
-        display: block;
-        margin-top: 8px;
-        color: var(--ink);
-        font-size: 26px;
-        letter-spacing: -0.03em;
-      }
+            .typed-value strong {
+                display: block;
+                margin-top: 8px;
+                color: var(--ink);
+                font-size: 26px;
+                letter-spacing: -0.03em;
+            }
 
-      .guide {
-        position: absolute;
-        left: 48px;
-        bottom: 40px;
-        right: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        color: var(--muted);
-        font-size: 14px;
-      }
+            .guide {
+                position: absolute;
+                left: 48px;
+                bottom: 40px;
+                right: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+                color: var(--muted);
+                font-size: 14px;
+            }
 
-      .guide strong {
-        color: var(--ink);
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <section class="intro">
-        <div class="eyebrow">interactive fixture</div>
-        <h1>Mouse and keyboard delivery through the streamed shell</h1>
-        <p class="lede">
-          This page exposes deterministic hover, click, focus, and text-input states so the E2E suite can verify that
-          the remote browser reacts to real user input routed through Portal.
-        </p>
+            .guide strong {
+                color: var(--ink);
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <section class="intro">
+                <div class="eyebrow">interactive fixture</div>
+                <h1>Mouse and keyboard delivery through the streamed shell</h1>
+                <p class="lede">
+                    This page exposes deterministic hover, click, focus, and text-input states so the E2E suite can
+                    verify that the remote browser reacts to real user input routed through Portal.
+                </p>
 
-        <div class="state-grid">
-          <article class="state-card">
-            <span class="state-label">mouse state</span>
-            <span class="state-value" id="mouse-state">idle</span>
-            <span class="state-meta" id="mouse-meta">waiting for hover or click</span>
-          </article>
+                <div class="state-grid">
+                    <article class="state-card">
+                        <span class="state-label">mouse state</span>
+                        <span class="state-value" id="mouse-state">idle</span>
+                        <span class="state-meta" id="mouse-meta">waiting for hover or click</span>
+                    </article>
 
-          <article class="state-card">
-            <span class="state-label">keyboard state</span>
-            <span class="state-value" id="keyboard-state">idle</span>
-            <span class="state-meta" id="keyboard-meta">focus the input and type through the shell</span>
-          </article>
-        </div>
-      </section>
+                    <article class="state-card">
+                        <span class="state-label">keyboard state</span>
+                        <span class="state-value" id="keyboard-state">idle</span>
+                        <span class="state-meta" id="keyboard-meta">focus the input and type through the shell</span>
+                    </article>
+                </div>
+            </section>
 
-      <section class="stage" aria-label="interaction stage">
-        <div class="stage-header">
-          <strong>Remote interaction surface</strong>
-          <span>The targets below are intentionally large so the E2E suite can click them by coordinate.</span>
-        </div>
+            <section class="stage" aria-label="interaction stage">
+                <div class="stage-header">
+                    <strong>Remote interaction surface</strong>
+                    <span
+                        >The targets below are intentionally large so the E2E suite can click them by coordinate.</span
+                    >
+                </div>
 
-        <button class="mouse-target" id="mouse-target" type="button">
-          <div class="mouse-target-copy">
-            <div class="mouse-target-label">mouse target</div>
-            <strong id="mouse-target-title">Awaiting pointer input</strong>
-            <span id="mouse-target-copy">Hover, press, and click to toggle the delivery badge.</span>
-          </div>
-        </button>
+                <button class="mouse-target" id="mouse-target" type="button">
+                    <div class="mouse-target-copy">
+                        <div class="mouse-target-label">mouse target</div>
+                        <strong id="mouse-target-title">Awaiting pointer input</strong>
+                        <span id="mouse-target-copy">Hover, press, and click to toggle the delivery badge.</span>
+                    </div>
+                </button>
 
-        <div class="keyboard-panel">
-          <label for="keyboard-input">keyboard target</label>
-          <input id="keyboard-input" autocomplete="off" spellcheck="false" value="" />
-          <div class="typed-value">
-            captured value
-            <strong id="typed-value">empty</strong>
-          </div>
-        </div>
+                <div class="keyboard-panel">
+                    <label for="keyboard-input">keyboard target</label>
+                    <input id="keyboard-input" autocomplete="off" spellcheck="false" value="" />
+                    <div class="typed-value">
+                        captured value
+                        <strong id="typed-value">empty</strong>
+                    </div>
+                </div>
 
-        <div class="guide">
-          <span><strong>mouse target center:</strong> x=946 y=246</span>
-          <span><strong>keyboard input center:</strong> x=946 y=516</span>
-        </div>
-      </section>
-    </main>
+                <div class="guide">
+                    <span><strong>mouse target center:</strong> x=946 y=246</span>
+                    <span><strong>keyboard input center:</strong> x=946 y=516</span>
+                </div>
+            </section>
+        </main>
 
-    <script>
-      const mouseState = document.getElementById("mouse-state");
-      const mouseMeta = document.getElementById("mouse-meta");
-      const keyboardState = document.getElementById("keyboard-state");
-      const keyboardMeta = document.getElementById("keyboard-meta");
-      const mouseTarget = document.getElementById("mouse-target");
-      const mouseTargetTitle = document.getElementById("mouse-target-title");
-      const mouseTargetCopy = document.getElementById("mouse-target-copy");
-      const keyboardInput = document.getElementById("keyboard-input");
-      const typedValue = document.getElementById("typed-value");
+        <script>
+            const mouseState = document.getElementById('mouse-state');
+            const mouseMeta = document.getElementById('mouse-meta');
+            const keyboardState = document.getElementById('keyboard-state');
+            const keyboardMeta = document.getElementById('keyboard-meta');
+            const mouseTarget = document.getElementById('mouse-target');
+            const mouseTargetTitle = document.getElementById('mouse-target-title');
+            const mouseTargetCopy = document.getElementById('mouse-target-copy');
+            const keyboardInput = document.getElementById('keyboard-input');
+            const typedValue = document.getElementById('typed-value');
 
-      const setMouse = (value, meta) => {
-        mouseState.textContent = value;
-        mouseMeta.textContent = meta;
-      };
+            const setMouse = (value, meta) => {
+                mouseState.textContent = value;
+                mouseMeta.textContent = meta;
+            };
 
-      const setKeyboard = (value, meta) => {
-        keyboardState.textContent = value;
-        keyboardMeta.textContent = meta;
-      };
+            const setKeyboard = (value, meta) => {
+                keyboardState.textContent = value;
+                keyboardMeta.textContent = meta;
+            };
 
-      mouseTarget.addEventListener("pointerenter", () => {
-        mouseTarget.classList.add("is-hovered");
-        setMouse("hover", "pointer move reached the remote button");
-        mouseTargetTitle.textContent = "Pointer hover received";
-        mouseTargetCopy.textContent = "The remote page highlighted the target before a click.";
-      });
+            mouseTarget.addEventListener('pointerenter', () => {
+                mouseTarget.classList.add('is-hovered');
+                setMouse('hover', 'pointer move reached the remote button');
+                mouseTargetTitle.textContent = 'Pointer hover received';
+                mouseTargetCopy.textContent = 'The remote page highlighted the target before a click.';
+            });
 
-      mouseTarget.addEventListener("pointerleave", () => {
-        mouseTarget.classList.remove("is-hovered");
-        mouseTarget.classList.remove("is-pressed");
-        setMouse("idle", "waiting for hover or click");
-        mouseTargetTitle.textContent = mouseTarget.classList.contains("is-active")
-          ? "Mouse click delivered"
-          : "Awaiting pointer input";
-        mouseTargetCopy.textContent = mouseTarget.classList.contains("is-active")
-          ? "The click state sticks so the screenshot can assert it."
-          : "Hover, press, and click to toggle the delivery badge.";
-      });
+            mouseTarget.addEventListener('pointerleave', () => {
+                mouseTarget.classList.remove('is-hovered');
+                mouseTarget.classList.remove('is-pressed');
+                setMouse('idle', 'waiting for hover or click');
+                mouseTargetTitle.textContent = mouseTarget.classList.contains('is-active')
+                    ? 'Mouse click delivered'
+                    : 'Awaiting pointer input';
+                mouseTargetCopy.textContent = mouseTarget.classList.contains('is-active')
+                    ? 'The click state sticks so the screenshot can assert it.'
+                    : 'Hover, press, and click to toggle the delivery badge.';
+            });
 
-      mouseTarget.addEventListener("mousedown", () => {
-        mouseTarget.classList.add("is-pressed");
-        setMouse("pressed", "mouse down reached the remote button");
-      });
+            mouseTarget.addEventListener('mousedown', () => {
+                mouseTarget.classList.add('is-pressed');
+                setMouse('pressed', 'mouse down reached the remote button');
+            });
 
-      mouseTarget.addEventListener("mouseup", () => {
-        mouseTarget.classList.remove("is-pressed");
-        setMouse("released", "mouse up completed on the remote button");
-      });
+            mouseTarget.addEventListener('mouseup', () => {
+                mouseTarget.classList.remove('is-pressed');
+                setMouse('released', 'mouse up completed on the remote button');
+            });
 
-      mouseTarget.addEventListener("click", () => {
-        mouseTarget.classList.add("is-active");
-        setMouse("clicked", "full click sequence completed in the remote browser");
-        mouseTargetTitle.textContent = "Mouse click delivered";
-        mouseTargetCopy.textContent = "The target stayed active after the click.";
-      });
+            mouseTarget.addEventListener('click', () => {
+                mouseTarget.classList.add('is-active');
+                setMouse('clicked', 'full click sequence completed in the remote browser');
+                mouseTargetTitle.textContent = 'Mouse click delivered';
+                mouseTargetCopy.textContent = 'The target stayed active after the click.';
+            });
 
-      keyboardInput.addEventListener("focus", () => {
-        setKeyboard("focused", "the remote input accepted focus");
-      });
+            keyboardInput.addEventListener('focus', () => {
+                setKeyboard('focused', 'the remote input accepted focus');
+            });
 
-      keyboardInput.addEventListener("blur", () => {
-        setKeyboard("idle", "focus left the remote input");
-      });
+            keyboardInput.addEventListener('blur', () => {
+                setKeyboard('idle', 'focus left the remote input');
+            });
 
-      keyboardInput.addEventListener("keydown", (event) => {
-        setKeyboard("keydown", "last keydown: " + event.key);
-      });
+            keyboardInput.addEventListener('keydown', (event) => {
+                setKeyboard('keydown', 'last keydown: ' + event.key);
+            });
 
-      keyboardInput.addEventListener("keyup", (event) => {
-        setKeyboard("keyup", "last keyup: " + event.key);
-      });
+            keyboardInput.addEventListener('keyup', (event) => {
+                setKeyboard('keyup', 'last keyup: ' + event.key);
+            });
 
-      keyboardInput.addEventListener("input", () => {
-        typedValue.textContent = keyboardInput.value === "" ? "empty" : keyboardInput.value;
-        keyboardMeta.textContent =
-          keyboardInput.value === ""
-            ? "the input was cleared"
-            : "typed through the shell: " + keyboardInput.value;
-      });
-    </script>
-  </body>
+            keyboardInput.addEventListener('input', () => {
+                typedValue.textContent = keyboardInput.value === '' ? 'empty' : keyboardInput.value;
+                keyboardMeta.textContent =
+                    keyboardInput.value === ''
+                        ? 'the input was cleared'
+                        : 'typed through the shell: ' + keyboardInput.value;
+            });
+        </script>
+    </body>
 </html>

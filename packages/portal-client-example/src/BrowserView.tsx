@@ -219,11 +219,7 @@ export const BrowserView = ({
         <Card className={`col-span-12 h-full min-h-0 overflow-hidden p-0 ${className ?? ''}`.trim()}>
             <CardContent className="h-full min-h-0 p-0">
                 <section className="flex h-full min-h-0 flex-col">
-                    <div
-                        data-location={location ?? ''}
-                        data-testid="portal-location"
-                        hidden
-                    />
+                    <div data-location={location ?? ''} data-testid="portal-location" hidden />
                     <div ref={viewportRef} className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
                         <div
                             ref={shellRef}
