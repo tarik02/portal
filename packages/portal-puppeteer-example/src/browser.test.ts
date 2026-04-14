@@ -90,7 +90,14 @@ describe('puppeteer browser runtime', () => {
 
         const runtime = await createPuppeteerBrowserRuntime();
 
-        expect(launch).toHaveBeenCalledWith({ headless: true });
+        expect(launch).toHaveBeenCalledWith({
+            defaultViewport: {
+                deviceScaleFactor: 1,
+                height: 800,
+                width: 1280,
+            },
+            headless: 'shell',
+        });
         expect(browser.newPage).toHaveBeenCalledTimes(1);
         expect(page.goto).toHaveBeenCalledWith('about:blank');
         expect(runtime.page$.value).toBe(page);

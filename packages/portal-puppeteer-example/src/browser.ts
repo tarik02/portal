@@ -8,7 +8,14 @@ export type PuppeteerBrowserRuntime = {
 };
 
 export const createPuppeteerBrowserRuntime = async (): Promise<PuppeteerBrowserRuntime> => {
-    const browser = await launch({ headless: true });
+    const browser = await launch({
+        defaultViewport: {
+            deviceScaleFactor: 1,
+            height: 800,
+            width: 1280,
+        },
+        headless: 'shell',
+    });
     const page = await browser.newPage();
     const page$ = new BehaviorSubject<Page | null>(page);
 

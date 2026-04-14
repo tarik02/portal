@@ -7,3 +7,5 @@ packages/portal-playwright-example/data/
 dist
 *.tsbuildinfo
 **/*.tsbuildinfo
+packages/portal-e2e/playwright-report/
+packages/portal-e2e/test-results/

@@ -51,6 +51,13 @@ const config = {
                 config: ['tsconfig.json'],
             },
         },
+        'packages/portal-e2e': {
+            entry: ['src/**/*.spec.ts', 'playwright.config.ts', 'scripts/**/*.ts'],
+            project: ['src/**/*.ts', 'scripts/**/*.ts', 'playwright.config.ts'],
+            typescript: {
+                config: ['tsconfig.json'],
+            },
+        },
         'packages/portal-example-common': {
             entry: ['src/**/*.test.ts'],
             project: ['src/**/*.{ts,tsx}', '!src/index.ts'],

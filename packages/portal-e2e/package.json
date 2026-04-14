@@ -1,0 +1,21 @@
+{
+  "name": "@tarik02/portal-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:update": "playwright test --update-snapshots",
+    "e2e:playwright": "playwright test --grep @playwright",
+    "e2e:playwright:update": "playwright test --grep @playwright --update-snapshots",
+    "e2e:puppeteer": "playwright test --grep @puppeteer",
+    "e2e:puppeteer:update": "playwright test --grep @puppeteer --update-snapshots"
+  },
+  "dependencies": {
+    "@tarik02/portal-example-common": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.2"
+  }
+}

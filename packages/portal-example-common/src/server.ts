@@ -13,6 +13,12 @@ import {
     createWebSocketServerTransport,
     type PortalBackend,
 } from '@tarik02/portal-server';
+import { PORTAL_EXAMPLE_VISUAL_FIXTURE_HTML } from './visual-fixture';
+
+export const PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_PATH = '/__e2e/interactive';
+export const PORTAL_EXAMPLE_VISUAL_FIXTURE_PATH = '/__e2e/visual';
+
+const PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_HTML_PATH = new URL('./interactive-fixture.html', import.meta.url);
 
 export type PortalExampleEmbeddedConfig = {
     portalUrl: string;
@@ -274,12 +280,25 @@ export const createPortalExampleServer = async <TBrowserRuntime extends { close:
     createBrowserRuntime,
     createBackend,
 }: PortalExampleServerOptions<TBrowserRuntime>): Promise<PortalExampleServer> => {
-    const shellHtml = await readFile(indexHtmlPath, 'utf8');
+    const [interactiveFixtureHtml, shellHtml] = await Promise.all([
+        readFile(PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_HTML_PATH, 'utf8'),
+        readFile(indexHtmlPath, 'utf8'),
+    ]);
 
     return await createPortalExampleServerBase({
         configureApp: (app) => {
             app.get('/', (c) => c.html(injectPortalConfig(shellHtml, embeddedConfig)));
             app.get('/index.html', (c) => c.html(injectPortalConfig(shellHtml, embeddedConfig)));
+            app.get(PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_PATH, (c) =>
+                c.html(interactiveFixtureHtml, 200, {
+                    'cache-control': 'no-store',
+                }),
+            );
+            app.get(PORTAL_EXAMPLE_VISUAL_FIXTURE_PATH, (c) =>
+                c.html(PORTAL_EXAMPLE_VISUAL_FIXTURE_HTML, 200, {
+                    'cache-control': 'no-store',
+                }),
+            );
             app.get('/assets/*', (c) => readStaticFile(c.req.path, assetsDir));
         },
         createBackend,

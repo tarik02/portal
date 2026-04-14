@@ -8,6 +8,8 @@ export { type PortalExampleEmbeddedConfig } from './server';
 export { type PortalExampleServer } from './server';
 export { type PortalExampleServerOptions } from './server';
 export { type PortalExampleRuntimeServerOptions } from './server';
+export { PORTAL_EXAMPLE_INTERACTIVE_FIXTURE_PATH } from './server';
+export { PORTAL_EXAMPLE_VISUAL_FIXTURE_PATH } from './server';
 export { createPortalExampleRuntimeServer } from './server';
 export { createPortalExampleServer } from './server';
 export {

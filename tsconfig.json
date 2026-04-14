@@ -23,6 +23,9 @@
       "path": "./packages/portal-client-example/tsconfig.json"
     },
     {
+      "path": "./packages/portal-e2e/tsconfig.json"
+    },
+    {
       "path": "./packages/portal-example-common/tsconfig.json"
     }
   ]

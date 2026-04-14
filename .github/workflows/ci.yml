@@ -3,6 +3,9 @@ name: ci
 on:
   pull_request:
 
+env:
+  YARN_CACHE_DIR: ~/.cache/yarn/berry
+
 jobs:
   build:
     name: build
@@ -21,6 +24,20 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
 
       - name: install dependencies
         run: yarn install --immutable
@@ -45,6 +62,20 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
 
       - name: install dependencies
         run: yarn install --immutable
@@ -73,6 +104,20 @@ jobs:
       - name: enable corepack
         run: corepack enable
 
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
       - name: install dependencies
         run: yarn install --immutable
 
@@ -96,6 +141,20 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
 
       - name: install dependencies
         run: yarn install --immutable
@@ -121,6 +180,20 @@ jobs:
       - name: enable corepack
         run: corepack enable
 
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
       - name: install dependencies
         run: yarn install --immutable
 
@@ -144,6 +217,20 @@ jobs:
 
       - name: enable corepack
         run: corepack enable
+
+      - name: restore yarn package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.YARN_CACHE_DIR }}
+          key: ${{ runner.os }}-yarn-store-${{ hashFiles('yarn.lock', '.yarnrc.yml', 'mise.toml') }}
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/install-state.gz
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package.json', 'packages/*/package.json', 'yarn.lock', '.yarnrc.yml', 'mise.toml') }}
 
       - name: install dependencies
         run: yarn install --immutable

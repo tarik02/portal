@@ -460,6 +460,7 @@ export const App = ({ useSession = usePortalSession }: { useSession?: PortalSess
                         <div className="flex items-center gap-1.5">
                             <Badge
                                 className="w-24 shrink-0 justify-center cursor-default select-none"
+                                data-testid="portal-frame-size"
                                 variant="secondary"
                             >
                                 <span className="font-mono text-[10px] uppercase tracking-wide">
@@ -484,7 +485,7 @@ export const App = ({ useSession = usePortalSession }: { useSession?: PortalSess
                                     className="w-24 shrink-0 justify-center cursor-default select-none"
                                     variant={statusVariantByConnectionState[session.connectionState]}
                                 >
-                                    {session.connectionState}
+                                    <span data-testid="portal-connection-status">{session.connectionState}</span>
                                 </Badge>
                             </FloatingDropdown>
                             <FloatingDropdown
@@ -602,6 +603,7 @@ export const App = ({ useSession = usePortalSession }: { useSession?: PortalSess
                             <Input
                                 aria-label="Address"
                                 className="h-8 rounded-sm bg-background/80 text-sm"
+                                data-testid="portal-address-input"
                                 onChange={(event) => setPageUrl(event.target.value)}
                                 placeholder="https://example.com/"
                                 value={pageUrl}
@@ -613,6 +615,7 @@ export const App = ({ useSession = usePortalSession }: { useSession?: PortalSess
                         className="min-h-0"
                         connectionState={session.connectionState}
                         frame={session.frame}
+                        location={session.location}
                         sendKeyboardCommand={session.keyboard}
                         sendMouseCommand={session.mouse}
                         sendTypeCommand={async (command) => {

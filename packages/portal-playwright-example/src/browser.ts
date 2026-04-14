@@ -9,7 +9,13 @@ export type PlaywrightBrowserRuntime = {
 
 export const createPlaywrightBrowserRuntime = async (): Promise<PlaywrightBrowserRuntime> => {
     const browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+        deviceScaleFactor: 1,
+        viewport: {
+            height: 800,
+            width: 1280,
+        },
+    });
     const page = await context.newPage();
     const page$ = new BehaviorSubject<Page | null>(page);
 

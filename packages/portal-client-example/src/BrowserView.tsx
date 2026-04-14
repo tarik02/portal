@@ -115,6 +115,7 @@ export const BrowserView = ({
     connectionState,
     emptyText,
     frame,
+    location,
     sendKeyboardCommand,
     sendMouseCommand,
     sendTypeCommand,
@@ -124,6 +125,7 @@ export const BrowserView = ({
     connectionState: PortalConnectionState;
     emptyText?: string;
     frame: PortalClientFrame | null;
+    location?: string | null;
     sendKeyboardCommand?: (command: PortalBrowserViewKeyboardCommand) => Promise<void> | void;
     sendMouseCommand?: (command: PortalBrowserViewMouseCommand) => Promise<void> | void;
     sendTypeCommand?: (command: PortalBrowserViewTypeCommand) => Promise<void> | void;
@@ -217,6 +219,11 @@ export const BrowserView = ({
         <Card className={`col-span-12 h-full min-h-0 overflow-hidden p-0 ${className ?? ''}`.trim()}>
             <CardContent className="h-full min-h-0 p-0">
                 <section className="flex h-full min-h-0 flex-col">
+                    <div
+                        data-location={location ?? ''}
+                        data-testid="portal-location"
+                        hidden
+                    />
                     <div ref={viewportRef} className="flex min-h-0 flex-1 items-center justify-center overflow-hidden">
                         <div
                             ref={shellRef}
@@ -258,6 +265,7 @@ export const BrowserView = ({
                                 <img
                                     alt="Live browser frame"
                                     className="block h-full w-full object-contain"
+                                    data-testid="browser-view-image"
                                     height={frameSize?.height}
                                     src={imageSrc}
                                     width={frameSize?.width}
