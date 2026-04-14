@@ -2,6 +2,15 @@ name: release
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: run the release workflow in dry-run mode
+        required: false
+        default: false
+        type: boolean
+  pull_request:
+    branches:
+      - master
 
 env:
   CI_YARN_CACHE_DIR: ~/.cache/yarn/berry
@@ -10,13 +19,15 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           filter: tree:0
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: jdx/mise-action@v4
         with:
@@ -44,6 +55,7 @@ jobs:
         run: yarn install --immutable
 
       - name: setup npm auth
+        if: ${{ github.event_name != 'pull_request' && !inputs.dry_run }}
         run: |
           yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
           npm config set //registry.npmjs.org/:_authToken "${NODE_AUTH_TOKEN}"
@@ -51,7 +63,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: release
-        run: yarn release
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ inputs.dry_run }}" = "true" ]; then
+            yarn release --dry-run
+          else
+            PUBLISH_PROVENANCE=true yarn release
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_PROVENANCE: true

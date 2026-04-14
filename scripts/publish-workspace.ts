@@ -9,6 +9,10 @@ function requireEnv(name: string): string {
     return value;
 }
 
+function isEnabled(value: string | undefined): boolean {
+    return value === '1' || value === 'true';
+}
+
 function run(command: string, args: string[], cwd = process.cwd()) {
     return new Promise<void>((resolve, reject) => {
         const child = spawn(command, args, {
@@ -40,7 +44,7 @@ async function main() {
 
     const publishArgs = ['publish', distDir, '--tag', tag, '--access', access];
 
-    if (process.env.RELEASE_IT_WORKSPACES_DRY_RUN) {
+    if (isEnabled(process.env.RELEASE_IT_WORKSPACES_DRY_RUN)) {
         publishArgs.push('--dry-run');
     }
 
@@ -48,7 +52,7 @@ async function main() {
         publishArgs.push('--otp', otp);
     }
 
-    if (process.env.PUBLISH_PROVENANCE) {
+    if (isEnabled(process.env.PUBLISH_PROVENANCE)) {
         publishArgs.push('--provenance');
     }
 
