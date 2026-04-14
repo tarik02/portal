@@ -73,7 +73,7 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ inputs.dry_run }}" = "true" ]; then
             yarn release --dry-run
           else
-            PUBLISH_PROVENANCE=true yarn release
+            yarn release
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
