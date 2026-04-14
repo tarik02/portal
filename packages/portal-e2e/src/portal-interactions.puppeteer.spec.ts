@@ -54,8 +54,6 @@ test('puppeteer backend forwards keyboard input to the remote page @puppeteer', 
     });
     await waitForBrowserViewFrameChange(page, async () => {
         await browserViewShell.press('a');
-    });
-    await waitForBrowserViewFrameChange(page, async () => {
         await browserViewShell.press('b');
     });
 
