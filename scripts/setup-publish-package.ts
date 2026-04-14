@@ -93,7 +93,7 @@ async function main() {
     const distPath = path.resolve(distDir, 'package.json');
 
     const source = PackageJsonSchema.parse(JSON.parse(await readFile(srcPath, 'utf8'))) as PackageJson;
-    const rootPath = path.resolve(projectRoot, '..', 'package.json');
+    const rootPath = path.resolve(process.cwd(), 'package.json');
     const rootPackage = JSON.parse(await readFile(rootPath, 'utf8')) as { license?: string };
 
     const repository = {

@@ -3,12 +3,14 @@
   "npm": false,
   "plugins": {
     "@release-it/conventional-changelog": {
-      "preset": "conventionalcommits",
+      "preset": {
+        "name": "conventionalcommits"
+      },
       "infile": false
     },
     "@release-it-plugins/workspaces": {
       "workspaces": ["packages/portal-core", "packages/portal-client", "packages/portal-server"],
-      "publishCommand": "node scripts/setup-publish-package.ts \"$RELEASE_IT_WORKSPACES_PATH_TO_WORKSPACE\" && yarn publish \"$RELEASE_IT_WORKSPACES_PATH_TO_WORKSPACE/dist\" --tag \"$RELEASE_IT_WORKSPACES_TAG\" --access public ${RELEASE_IT_WORKSPACES_DRY_RUN:+--dry-run}"
+      "publishCommand": "node scripts/publish-workspace.ts"
     }
   }
 }
