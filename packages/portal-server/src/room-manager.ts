@@ -125,6 +125,7 @@ export const createPortalRoomManager = (): PortalRoomManager => {
 
         const sharedBackend: PortalBackend = {
             location$: room.backend.location$,
+            getLocation: () => room.backend.getLocation(),
             execute: (command) => room.backend.execute(command),
             startView: async () => {
                 const existingViewer = room.viewers.get(connectionId);

@@ -44,6 +44,7 @@ describe('portal room manager', () => {
             transport: serverTransportA,
             createBackend: () => ({
                 location$: EMPTY,
+                getLocation: () => Promise.resolve(null),
                 execute: () => Promise.resolve(),
                 startView,
                 stopView: () => Promise.resolve(),
@@ -55,6 +56,7 @@ describe('portal room manager', () => {
             transport: serverTransportB,
             createBackend: () => ({
                 location$: EMPTY,
+                getLocation: () => Promise.resolve(null),
                 execute: () => Promise.resolve(),
                 startView,
                 stopView: () => Promise.resolve(),

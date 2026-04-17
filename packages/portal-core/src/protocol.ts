@@ -92,6 +92,7 @@ export type PortalHelloEvent = {
     protocolVersion: typeof PORTAL_PROTOCOL_VERSION;
     capabilities: string[];
     extensions: string[];
+    location: string | null;
 };
 
 export type PortalLocationChangedEvent = {

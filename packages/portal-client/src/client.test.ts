@@ -5,6 +5,42 @@ import { createMemoryPortalTransportPair } from '@tarik02/portal-core';
 import { createPortalClient } from './client';
 
 describe('portal client', () => {
+    it('seeds location state from hello before navigation updates arrive', async () => {
+        const [serverTransport, clientTransport] = createMemoryPortalTransportPair();
+        const client = createPortalClient({
+            transport: clientTransport,
+        });
+        const locations: Array<string | null> = [];
+
+        client.location$.subscribe((location) => {
+            locations.push(location);
+        });
+
+        await serverTransport.send({
+            kind: 'json',
+            value: {
+                type: 'hello',
+                protocolVersion: 1,
+                capabilities: [],
+                extensions: [],
+                location: 'https://example.com/initial',
+            },
+        });
+        await serverTransport.send({
+            kind: 'json',
+            value: {
+                type: 'location.changed',
+                url: 'https://example.com/next',
+            },
+        });
+
+        await Promise.resolve();
+
+        expect(locations).toEqual([null, 'https://example.com/initial', 'https://example.com/next']);
+
+        await client.close();
+    });
+
     it('correlates command results and pairs frame metadata with payloads', async () => {
         const [serverTransport, clientTransport] = createMemoryPortalTransportPair();
         const client = createPortalClient({
