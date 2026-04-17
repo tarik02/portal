@@ -235,6 +235,10 @@ describe('puppeteer example server', () => {
             }),
         );
         expect(hello?.kind).toBe('json');
+        expect(hello?.kind === 'json' ? hello.value : null).toMatchObject({
+            type: 'hello',
+            location: 'about:blank',
+        });
 
         client.send(
             codec.encode({

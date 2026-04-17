@@ -44,6 +44,8 @@ export const createPortalSessionHost = ({
     const subscriptions = new Subscription();
     let activeView: PortalViewSource | null = null;
     let activeViewSubscription: Subscription | null = null;
+    let latestLocation: string | null = null;
+    let helloSent = false;
 
     const extensionNames = extensions.flatMap((extension) => Object.keys(extension.commands ?? {}));
 
@@ -90,6 +92,11 @@ export const createPortalSessionHost = ({
 
     subscriptions.add(
         backend.location$.subscribe((url) => {
+            latestLocation = url;
+            if (!helloSent) {
+                return;
+            }
+
             void transport.send({
                 kind: 'json',
                 value: {
@@ -187,15 +194,31 @@ export const createPortalSessionHost = ({
         }),
     );
 
-    void transport.send({
-        kind: 'json',
-        value: {
-            type: 'hello',
-            protocolVersion: PORTAL_PROTOCOL_VERSION,
-            capabilities: [...CORE_COMMAND_TYPES],
-            extensions: extensionNames,
-        },
-    });
+    void (async () => {
+        const helloLocation = (await backend.getLocation().catch(() => null)) ?? latestLocation;
+
+        await transport.send({
+            kind: 'json',
+            value: {
+                type: 'hello',
+                protocolVersion: PORTAL_PROTOCOL_VERSION,
+                capabilities: [...CORE_COMMAND_TYPES],
+                extensions: extensionNames,
+                location: helloLocation,
+            },
+        });
+        helloSent = true;
+
+        if (latestLocation !== null && latestLocation !== helloLocation) {
+            await transport.send({
+                kind: 'json',
+                value: {
+                    type: 'location.changed',
+                    url: latestLocation,
+                },
+            });
+        }
+    })();
 
     return {
         close: async () => {

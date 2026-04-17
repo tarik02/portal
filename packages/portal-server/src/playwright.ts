@@ -91,6 +91,15 @@ const executeKeyboardCommand = async (
 export const createPlaywrightPortalBackend = ({ page$, resolvePage }: PlaywrightPageResolver): PortalBackend => {
     let activeView: PortalViewSource | null = null;
 
+    const getLocation = async () => {
+        const page = await resolvePage();
+        if (page === null || page.isClosed()) {
+            return null;
+        }
+
+        return page.url();
+    };
+
     const execute = async (command: PortalExecutableCommand) => {
         const page = await resolvePageOrFail(resolvePage);
 
@@ -218,6 +227,7 @@ export const createPlaywrightPortalBackend = ({ page$, resolvePage }: Playwright
 
     return {
         location$: observeLocation(page$),
+        getLocation,
         execute,
         startView,
         stopView,

@@ -27,6 +27,7 @@ export interface PortalViewSource {
 
 export interface PortalBackend {
     readonly location$: Observable<string>;
+    getLocation(): Promise<string | null>;
     execute(command: PortalExecutableCommand): Promise<void>;
     startView(): Promise<PortalViewSource>;
     stopView(): Promise<void>;

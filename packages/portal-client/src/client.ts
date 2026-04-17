@@ -99,6 +99,11 @@ export const createPortalClient = ({ transport }: { transport: PortalTransport }
             const event = packet.value as PortalServerEvent;
             events.next(event);
 
+            if (event.type === 'hello' && 'location' in event) {
+                location.next(event.location);
+                return;
+            }
+
             if (event.type === 'location.changed' && 'url' in event) {
                 location.next(event.url);
                 return;
