@@ -1,5 +1,20 @@
 # @tarik02/portal-client
 
+## 0.2.0
+
+### Minor Changes
+
+- e8f74d6: send initial location in hello
+
+  The portal handshake now includes the current page location in the initial `hello`
+  event, and the client seeds its location state from that value before later
+  `location.changed` updates arrive.
+
+### Patch Changes
+
+- Updated dependencies [e8f74d6]
+  - @tarik02/portal-core@0.2.0
+
 ## 0.1.2
 
 ### Patch Changes
