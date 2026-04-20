@@ -1,5 +1,11 @@
 # @tarik02/portal-server
 
+## 0.2.1
+
+### Patch Changes
+
+- 8aa5b1c: replay the latest shared frame for late-joining portal viewers and cover the delayed second-client flow in e2e
+
 ## 0.2.0
 
 ### Minor Changes
