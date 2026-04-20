@@ -1,4 +1,5 @@
 ---
+'@tarik02/portal-server': patch
 ---
 
-add e2e coverage for shared portal connections
+replay the latest shared frame for late-joining portal viewers and cover the delayed second-client flow in e2e
