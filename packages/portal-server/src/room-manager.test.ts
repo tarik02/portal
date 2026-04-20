@@ -50,6 +50,26 @@ describe('portal room manager', () => {
                 stopView: () => Promise.resolve(),
             }),
         });
+        await clientTransportA.send({
+            kind: 'json',
+            value: {
+                requestId: 'view-a',
+                type: 'view.start',
+            },
+        });
+
+        await tick();
+
+        frames.next({
+            frameId: 'frame-1',
+            format: 'jpeg',
+            metadata: { width: 1, height: 1 },
+            payload: new Uint8Array([7, 8, 9]),
+            ack: () => Promise.resolve(),
+        });
+
+        await tick();
+
         const connectionB = await attachPortalConnection({
             roomManager,
             roomId: 'worker-1',
@@ -63,29 +83,12 @@ describe('portal room manager', () => {
             }),
         });
 
-        await clientTransportA.send({
-            kind: 'json',
-            value: {
-                requestId: 'view-a',
-                type: 'view.start',
-            },
-        });
         await clientTransportB.send({
             kind: 'json',
             value: {
                 requestId: 'view-b',
                 type: 'view.start',
             },
-        });
-
-        await tick();
-
-        frames.next({
-            frameId: 'frame-1',
-            format: 'jpeg',
-            metadata: { width: 1, height: 1 },
-            payload: new Uint8Array([7, 8, 9]),
-            ack: () => Promise.resolve(),
         });
 
         await tick();

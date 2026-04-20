@@ -19,6 +19,7 @@ type InternalPortalRoom = PortalRoom & {
     readonly extensions: PortalExtension[];
     readonly connections: Map<string, ConnectionState>;
     readonly viewers: Map<string, ReplaySubject<PortalViewFrame>>;
+    latestFrame: PortalViewFrame | null;
     sharedView: PortalViewSource | null;
     sharedViewSubscription: Subscription | null;
 };
@@ -53,6 +54,7 @@ const maybeStopSharedView = async (room: InternalPortalRoom) => {
 
     const current = room.sharedView;
     room.sharedView = null;
+    room.latestFrame = null;
     await current.stop();
     await room.backend.stopView();
 };
@@ -68,6 +70,8 @@ export const createPortalRoomManager = (): PortalRoomManager => {
         room.sharedView = await room.backend.startView();
         room.sharedViewSubscription = room.sharedView.frames$.subscribe({
             next: (frame) => {
+                room.latestFrame = cloneFrame(frame);
+
                 for (const viewer of room.viewers.values()) {
                     viewer.next(cloneFrame(frame));
                 }
@@ -78,11 +82,13 @@ export const createPortalRoomManager = (): PortalRoomManager => {
                 room.sharedViewSubscription?.unsubscribe();
                 room.sharedViewSubscription = null;
                 room.sharedView = null;
+                room.latestFrame = null;
             },
             complete: () => {
                 room.sharedViewSubscription?.unsubscribe();
                 room.sharedViewSubscription = null;
                 room.sharedView = null;
+                room.latestFrame = null;
             },
         });
     };
@@ -105,6 +111,7 @@ export const createPortalRoomManager = (): PortalRoomManager => {
                 extensions: createExtensions?.() ?? [],
                 connections: new Map(),
                 viewers: new Map(),
+                latestFrame: null,
                 sharedView: null,
                 sharedViewSubscription: null,
             };
@@ -138,6 +145,11 @@ export const createPortalRoomManager = (): PortalRoomManager => {
 
                 const viewer = new ReplaySubject<PortalViewFrame>(1);
                 room.viewers.set(connectionId, viewer);
+
+                if (room.latestFrame) {
+                    viewer.next(cloneFrame(room.latestFrame));
+                }
+
                 await ensureSharedView(room);
 
                 return {

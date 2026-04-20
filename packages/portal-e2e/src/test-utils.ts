@@ -16,6 +16,12 @@ export const waitForPortalReady = async (page: Page) => {
     await expect(browserViewImage).toBeVisible();
 };
 
+export const waitForPortalConnectionOpen = async (page: Page) => {
+    const connectionStatus = page.getByTestId('portal-connection-status');
+
+    await expect(connectionStatus).toHaveText('open');
+};
+
 export const submitAddress = async (page: Page, value: string) => {
     const addressInput = page.getByTestId('portal-address-input');
 
@@ -60,6 +66,28 @@ export const waitForBrowserViewFrameChange = async (page: Page, action: () => Pr
             },
         )
         .not.toBe(previousSrcHash);
+};
+
+export const waitForMatchingBrowserViewImage = async (pages: readonly [Page, Page]) => {
+    const [pageA, pageB] = pages;
+    const browserViewImageA = pageA.getByTestId('browser-view-image');
+    const browserViewImageB = pageB.getByTestId('browser-view-image');
+
+    await expect
+        .poll(
+            async () => {
+                const [srcA, srcB] = await Promise.all([
+                    browserViewImageA.getAttribute('src'),
+                    browserViewImageB.getAttribute('src'),
+                ]);
+
+                return srcA && srcB && srcA === srcB;
+            },
+            {
+                message: 'expected both browser view images to match',
+            },
+        )
+        .toBe(true);
 };
 
 export const clickBrowserViewAt = async (page: Page, point: { x: number; y: number }) => {
